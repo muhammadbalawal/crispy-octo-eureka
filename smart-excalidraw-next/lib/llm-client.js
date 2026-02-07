@@ -111,12 +111,13 @@ async function callAnthropic(baseUrl, apiKey, model, messages, onChunk) {
     headers: {
       'Content-Type': 'application/json',
       'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
       model,
       messages: processedMessages,
       system: systemMessage ? [{ type: 'text', text: systemMessage.content }] : undefined,
-      max_tokens: 64000,
+      max_tokens: 8192,
       stream: true,
       temperature: 1,
     }),

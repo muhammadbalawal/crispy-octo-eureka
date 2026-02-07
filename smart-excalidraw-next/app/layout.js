@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Smart Excalidraw",
+  title: "FlowCraft",
   description: "AI-Powered Diagram Generation",
 };
 
