@@ -247,8 +247,8 @@ class ConfigManager {
       errors.push('Config name cannot be empty');
     }
 
-    if (!config.type || !['openai', 'anthropic'].includes(config.type)) {
-      errors.push('Config type must be openai or anthropic');
+    if (!config.type || !['openai', 'anthropic', 'backboard'].includes(config.type)) {
+      errors.push('Config type must be openai, anthropic, or backboard');
     }
 
     if (!config.baseUrl || config.baseUrl.trim() === '') {

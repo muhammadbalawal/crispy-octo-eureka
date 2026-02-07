@@ -16,6 +16,8 @@ export async function callLLM(config, messages, onChunk) {
     return callOpenAI(baseUrl, apiKey, model, messages, onChunk);
   } else if (type === 'anthropic') {
     return callAnthropic(baseUrl, apiKey, model, messages, onChunk);
+  } else if (type === 'backboard') {
+    return callBackboard(baseUrl, apiKey, model, messages, onChunk);
   } else {
     throw new Error(`Unsupported provider type: ${type}`);
   }
@@ -176,6 +178,141 @@ async function processAnthropicStream(body, onChunk) {
 }
 
 /**
+ * Call Backboard API (Assistant/Thread/Message architecture)
+ */
+async function callBackboard(baseUrl, apiKey, model, messages, onChunk) {
+  const headers = { 'X-API-Key': apiKey };
+
+  // Extract system prompt and user content
+  const systemMessage = messages.find(m => m.role === 'system');
+  const systemPrompt = systemMessage ? systemMessage.content : '';
+  const userMessages = messages.filter(m => m.role !== 'system');
+  const userContent = userMessages.map(m => {
+    if (m.image) {
+      console.warn('Backboard: Image data in messages is not supported, sending text only');
+    }
+    return typeof m.content === 'string' ? m.content : JSON.stringify(m.content);
+  }).join('\n\n');
+
+  // Parse model string: "provider/model_name" or just "model_name"
+  let llmProvider = 'openai';
+  let modelName = model;
+  if (model.includes('/')) {
+    const parts = model.split('/');
+    llmProvider = parts[0];
+    modelName = parts.slice(1).join('/');
+  }
+
+  let assistantId = null;
+
+  try {
+    // 1. Create ephemeral assistant
+    const assistantRes = await fetch(`${baseUrl}/assistants`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'FlowCraft Session', system_prompt: systemPrompt }),
+    });
+    if (!assistantRes.ok) {
+      const err = await assistantRes.text();
+      throw new Error(`Backboard create assistant error: ${assistantRes.status} ${err}`);
+    }
+    const assistantData = await assistantRes.json();
+    assistantId = assistantData.assistant_id;
+
+    // 2. Create thread
+    const threadRes = await fetch(`${baseUrl}/assistants/${assistantId}/threads`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    if (!threadRes.ok) {
+      const err = await threadRes.text();
+      throw new Error(`Backboard create thread error: ${threadRes.status} ${err}`);
+    }
+    const threadData = await threadRes.json();
+    const threadId = threadData.thread_id;
+
+    // 3. Post message with streaming
+    const formData = new FormData();
+    formData.append('content', userContent);
+    formData.append('stream', 'true');
+    formData.append('model_name', modelName);
+    formData.append('llm_provider', llmProvider);
+    formData.append('memory', 'off');
+
+    const messageRes = await fetch(`${baseUrl}/threads/${threadId}/messages`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+    if (!messageRes.ok) {
+      const err = await messageRes.text();
+      throw new Error(`Backboard message error: ${messageRes.status} ${err}`);
+    }
+
+    return await processBackboardStream(messageRes.body, onChunk);
+  } finally {
+    // Cleanup: delete ephemeral assistant
+    if (assistantId) {
+      try {
+        await fetch(`${baseUrl}/assistants/${assistantId}`, {
+          method: 'DELETE',
+          headers,
+        });
+      } catch (cleanupErr) {
+        console.error('Backboard cleanup error (non-fatal):', cleanupErr);
+      }
+    }
+  }
+}
+
+/**
+ * Process Backboard streaming response (SSE)
+ */
+async function processBackboardStream(body, onChunk) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  let fullText = '';
+  let buffer = '';
+
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed || !trimmed.startsWith('data: ')) continue;
+
+        try {
+          const json = JSON.parse(trimmed.slice(6));
+
+          if (json.type === 'content_streaming') {
+            const content = json.content;
+            if (content) {
+              fullText += content;
+              if (onChunk) onChunk(content);
+            }
+          } else if (json.type === 'message_complete') {
+            break;
+          }
+        } catch (e) {
+          console.error('Failed to parse Backboard SSE:', e);
+        }
+      }
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  return fullText;
+}
+
+/**
  * Process message for OpenAI API with multimodal support
  * @param {Object} message - Message object
  * @returns {Object} Processed message for OpenAI
@@ -318,6 +455,24 @@ export async function fetchModels(type, baseUrl, apiKey) {
       .map(model => ({
         id: typeof model === 'string' ? model : (model.id || model.name || model.model || model.slug),
         name: typeof model === 'string' ? model : (model.name || model.id || model.model || model.slug),
+      }))
+      .filter(m => m.id);
+  } else if (type === 'backboard') {
+    const url = `${baseUrl}/models?model_type=llm`;
+    const response = await fetch(url, {
+      headers: { 'X-API-Key': apiKey },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch models: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const modelList = Array.isArray(data?.models) ? data.models : [];
+    return modelList
+      .map(model => ({
+        id: `${model.provider}/${model.name}`,
+        name: `${model.provider}/${model.name}`,
       }))
       .filter(m => m.id);
   } else {

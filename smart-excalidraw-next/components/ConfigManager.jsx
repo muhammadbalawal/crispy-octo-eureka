@@ -524,6 +524,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
             >
               <option value="openai">OpenAI</option>
               <option value="anthropic">Anthropic</option>
+              <option value="backboard">Backboard</option>
             </select>
           </div>
 
@@ -535,7 +536,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
               type="text"
               value={formData.baseUrl}
               onChange={(e) => setFormData({ ...formData, baseUrl: e.target.value })}
-              placeholder={formData.type === 'openai' ? 'https://api.openai.com/v1' : 'https://api.anthropic.com/v1'}
+              placeholder={formData.type === 'openai' ? 'https://api.openai.com/v1' : formData.type === 'backboard' ? 'https://app.backboard.io/api' : 'https://api.anthropic.com/v1'}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -548,7 +549,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
               type="password"
               value={formData.apiKey}
               onChange={(e) => setFormData({ ...formData, apiKey: e.target.value })}
-              placeholder="sk-..."
+              placeholder={formData.type === 'backboard' ? 'Your Backboard API key' : 'sk-...'}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -618,7 +619,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
                 type="text"
                 value={formData.model}
                 onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                placeholder="e.g., gpt-4, claude-3-opus-20240229"
+                placeholder={formData.type === 'backboard' ? 'e.g., openai/gpt-4o, anthropic/claude-3-5-sonnet' : 'e.g., gpt-4, claude-3-opus-20240229'}
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
               />
             )}
