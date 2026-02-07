@@ -19,12 +19,12 @@ function migrateLegacyConfig() {
       // Found legacy config and no new configs, migrate it
       const config = JSON.parse(legacyConfig);
       configManager.createConfig({
-        name: config.name || '迁移的配置',
+        name: config.name || 'Migrated Config',
         type: config.type,
         baseUrl: config.baseUrl,
         apiKey: config.apiKey,
         model: config.model,
-        description: '从旧版本迁移的配置'
+        description: 'Configuration migrated from old version'
       });
 
       // Clear the old config after migration

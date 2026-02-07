@@ -16,14 +16,14 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
   const [error, setError] = useState('');
   const [useCustomModel, setUseCustomModel] = useState(false);
 
-  // 仅在初始配置变更时同步到本地表单状态，避免在模型加载失败时还原用户输入
+  // Only sync to local form state on initial config change, to avoid reverting user input on model load failure
   useEffect(() => {
     if (initialConfig) {
       setConfig(initialConfig);
     }
   }, [initialConfig]);
 
-  // 根据当前表单中的模型与可用模型列表，决定是否使用自定义输入
+  // Based on current form model and available model list, decide whether to use custom input
   useEffect(() => {
     if (config.model) {
       if (models.length > 0) {
@@ -37,7 +37,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
 
   const handleLoadModels = async () => {
     if (!config.type || !config.baseUrl || !config.apiKey) {
-      setError('请先填写提供商类型、基础 URL 和 API 密钥');
+      setError('Please fill in provider type, base URL, and API key first');
       return;
     }
 
@@ -55,17 +55,17 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || '加载模型失败');
+        throw new Error(data.error || 'Failed to load models');
       }
 
       setModels(data.models);
       if (data.models.length > 0) {
-        // 如果当前模型不在新加载的列表中，切换到列表选择模式
+        // If current model is not in the newly loaded list, switch to list selection mode
         if (config.model && !data.models.some(m => m.id === config.model)) {
           setUseCustomModel(false);
           setConfig(prev => ({ ...prev, model: data.models[0].id }));
         } else if (!config.model && !useCustomModel) {
-          // 如果没有选择模型且不是手动输入模式，自动选择第一个
+          // If no model selected and not in manual input mode, auto-select the first one
           setConfig(prev => ({ ...prev, model: data.models[0].id }));
         }
       }
@@ -79,7 +79,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
 
   const handleSave = () => {
     if (!config.type || !config.baseUrl || !config.apiKey || !config.model) {
-      setError('请填写所有必填字段');
+      setError('Please fill in all required fields');
       return;
     }
 
@@ -101,7 +101,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
       <div className="relative bg-white rounded border border-gray-300 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">LLM 配置</h2>
+          <h2 className="text-lg font-semibold text-gray-900">LLM Configuration</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -121,19 +121,19 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
           )}
 
           <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800">提示：如果启用了访问密码，将优先使用服务器端配置</p>
+            <p className="text-sm text-blue-800">Note: If access password is enabled, server-side configuration will take priority</p>
           </div>
 
           {/* Provider Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              提供商名称
+              Provider Name
             </label>
             <input
               type="text"
               value={config.name}
               onChange={(e) => setConfig({ ...config, name: e.target.value })}
-              placeholder="例如：我的 OpenAI"
+              placeholder="e.g., My OpenAI"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -141,7 +141,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
           {/* Provider Type */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              提供商类型 <span className="text-red-500">*</span>
+              Provider Type <span className="text-red-500">*</span>
             </label>
             <select
               value={config.type}
@@ -156,7 +156,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
           {/* Base URL */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              基础 URL <span className="text-red-500">*</span>
+              Base URL <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -170,7 +170,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
           {/* API Key */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              API 密钥 <span className="text-red-500">*</span>
+              API Key <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -188,16 +188,16 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
               disabled={loading}
               className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors duration-200 font-medium"
             >
-              {loading ? '加载模型中...' : '加载可用模型'}
+              {loading ? 'Loading models...' : 'Load Available Models'}
             </button>
           </div>
 
           {/* Model Selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              模型 <span className="text-red-500">*</span>
+              Model <span className="text-red-500">*</span>
             </label>
-            <p className="text-xs text-gray-500 mb-2">推荐 claude-sonnet-4.5</p>
+            <p className="text-xs text-gray-500 mb-2">Recommended: claude-sonnet-4.5</p>
 
             {/* Toggle between selection and custom input */}
             {models.length > 0 && (
@@ -214,7 +214,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
                     }}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">从列表选择</span>
+                  <span className="text-sm text-gray-700">Select from list</span>
                 </label>
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -226,7 +226,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
                     }}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">手动输入</span>
+                  <span className="text-sm text-gray-700">Manual input</span>
                 </label>
               </div>
             )}
@@ -252,7 +252,7 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
                 type="text"
                 value={config.model}
                 onChange={(e) => setConfig({ ...config, model: e.target.value })}
-                placeholder="例如：gpt-4、claude-3-opus-20240229"
+                placeholder="e.g., gpt-4, claude-3-opus-20240229"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
               />
             )}
@@ -265,17 +265,16 @@ export default function ConfigModal({ isOpen, onClose, onSave, initialConfig, sh
             onClick={onClose}
             className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={handleSave}
             className="px-4 py-2 text-white bg-gray-900 rounded hover:bg-gray-800 transition-colors duration-200"
           >
-            保存配置
+            Save Config
           </button>
         </div>
       </div>
     </div>
   );
 }
-

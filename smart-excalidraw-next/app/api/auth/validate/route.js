@@ -8,22 +8,22 @@ export async function POST(request) {
 
     if (!accessPassword) {
       return NextResponse.json(
-        { valid: false, message: '服务器未配置访问密码' },
+        { valid: false, message: 'Access password not configured on server' },
         { status: 400 }
       );
     }
 
     if (password === accessPassword) {
-      return NextResponse.json({ valid: true, message: '密码验证成功' });
+      return NextResponse.json({ valid: true, message: 'Password verified successfully' });
     }
 
     return NextResponse.json(
-      { valid: false, message: '密码错误' },
+      { valid: false, message: 'Incorrect password' },
       { status: 401 }
     );
   } catch (error) {
     return NextResponse.json(
-      { valid: false, message: '验证失败' },
+      { valid: false, message: 'Verification failed' },
       { status: 500 }
     );
   }

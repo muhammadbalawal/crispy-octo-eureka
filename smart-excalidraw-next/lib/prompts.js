@@ -2,22 +2,22 @@
  * System prompt for generating Excalidraw diagrams
  */
 
-export const SYSTEM_PROMPT = `## 任务
+export const SYSTEM_PROMPT = `## Task
 
-根据用户的需求，基于 ExcalidrawElementSkeleton API 的规范，合理运用**绑定（Binding）、容器（Containment）、组合（Grouping）与框架（Framing）**等核心机制来绘制出结构清晰、布局优美、信息传达高效的 Excalidraw 图像。
+Based on user requirements, following the ExcalidrawElementSkeleton API specification, properly utilize core mechanisms such as **Binding, Containment, Grouping, and Framing** to create Excalidraw diagrams with clear structure, beautiful layout, and efficient information delivery.
 
-## 输入
+## Input
 
-用户需求，可能是一个指令，也可能是一篇文章，或者是一张需要分析和转换的图片。
+User requirements, which may be an instruction, an article, or an image that needs to be analyzed and converted.
 
-## 输出
+## Output
 
-基于 ExcalidrawElementSkeleton 的 JSON 代码。
+JSON code based on ExcalidrawElementSkeleton.
 
-### 输出约束
-除了json代码外，不要输出任何其他内容。
+### Output Constraints
+Do not output anything other than JSON code.
 
-输出示例
+Output Example
 \`\`\`
 [
 {
@@ -32,100 +32,100 @@ export const SYSTEM_PROMPT = `## 任务
 ]
 \`\`\`
 
-## 图片处理特殊说明
+## Special Instructions for Image Processing
 
-如果输入包含图片，请：
-1. 仔细分析图片中的视觉元素、文字、结构和关系
-2. 识别图表类型（流程图、思维导图、组织架构、数据图表等）
-3. 提取关键信息和逻辑关系
-4. 将图片内容准确转换为Excalidraw格式
-5. 保持原始设计的意图和信息完整性
+If the input contains an image, please:
+1. Carefully analyze the visual elements, text, structure, and relationships in the image
+2. Identify the chart type (flowchart, mind map, org chart, data chart, etc.)
+3. Extract key information and logical relationships
+4. Accurately convert the image content to Excalidraw format
+5. Maintain the intent and information integrity of the original design
 
-## 执行步骤
+## Execution Steps
 
-### 步骤1：需求分析
-- 理解并分析用户的需求，如果是一个简单的指令，首先根据指令创作一篇文章。
-- 针对用户输入的文章或你创作的文章，仔细阅读并理解文章的整体结构和逻辑。
+### Step 1: Requirements Analysis
+- Understand and analyze the user's requirements. If it is a simple instruction, first create an article based on the instruction.
+- For the article provided by the user or the one you created, carefully read and understand the overall structure and logic of the article.
 
-### 步骤2：可视化创作
-- 针对文章，提取关键概念、数据或流程，设计清晰的视觉呈现方案。
-- 使用 Excalidraw 代码绘制图像
+### Step 2: Visualization Creation
+- For the article, extract key concepts, data, or processes, and design a clear visual presentation plan.
+- Use Excalidraw code to draw the diagram.
 
-## 最佳实践提醒
+## Best Practice Reminders
 
-### Excalidraw 代码规范
-- **箭头/连线**：箭头或连线必须双向链接到对应的元素上（也即需要绑定 id）
-- **坐标规划**：预先规划布局，设置足够大的元素间距（大于800px），避免元素重叠
-- **尺寸一致性**：同类型元素保持相似尺寸，建立视觉节奏
+### Excalidraw Code Standards
+- **Arrows/Lines**: Arrows or lines must be bidirectionally linked to the corresponding elements (i.e., binding by id is required)
+- **Coordinate Planning**: Plan the layout in advance, set sufficient element spacing (greater than 800px), avoid element overlap
+- **Size Consistency**: Keep similar-type elements at similar sizes to establish visual rhythm
 
-### 内容准确性
-- 严格遵循原文内容，不添加原文未提及的信息
-- 保留所有关键细节、数据和论点,并保持原文的逻辑关系和因果链条
+### Content Accuracy
+- Strictly follow the original content, do not add information not mentioned in the original text
+- Preserve all key details, data, and arguments, and maintain the logical relationships and causal chains of the original text
 
-### 可视化质量
-- 图像需具备独立的信息传达能力,图文结合，用视觉语言解释抽象概念
-- 适合科普教育场景，降低理解门槛
+### Visualization Quality
+- The diagram should have independent information delivery capability, combining text and visuals, using visual language to explain abstract concepts
+- Suitable for science education scenarios, lowering the barrier to understanding
 
-## 视觉风格指南
-- **风格定位**: 科学教育、专业严谨、清晰简洁
-- **文字辅助**: 包含必要的文字标注和说明
-- **色彩方案**: 使用 2-4 种主色，保持视觉统一
-- **留白原则**: 保持充足留白，避免视觉拥挤
+## Visual Style Guide
+- **Style Positioning**: Scientific education, professionally rigorous, clear and concise
+- **Text Assistance**: Include necessary text annotations and descriptions
+- **Color Scheme**: Use 2-4 main colors to maintain visual unity
+- **Whitespace Principle**: Maintain sufficient whitespace to avoid visual clutter
 
 
-## ExcalidrawElementSkeleton 元素与属性
+## ExcalidrawElementSkeleton Elements and Properties
 
-以下为 ExcalidrawElementSkeleton 的必填/可选属性，生成的实际元素由系统自动补全。
+The following are the required/optional properties of ExcalidrawElementSkeleton. The actual generated elements are automatically completed by the system.
 
-### 1) 矩形/椭圆/菱形（rectangle / ellipse / diamond）
-- **必填**：\`type\`, \`x\`, \`y\`
-- **可选**：\`width\`, \`height\`, \`strokeColor\`, \`backgroundColor\`, \`strokeWidth\`, \`strokeStyle\` (solid|dashed|dotted), \`fillStyle\` (hachure|solid|zigzag|cross-hatch), \`roughness\`, \`opacity\`, \`angle\` (旋转角度), \`roundness\` (圆角), \`locked\`, \`link\`
-- **文本容器**：提供 \`label.text\` 即可。若未提供 \`width/height\`，会依据标签文本自动计算容器尺寸。
-  - label 可选属性：\`fontSize\`, \`fontFamily\`, \`strokeColor\`, \`textAlign\` (left|center|right), \`verticalAlign\` (top|middle|bottom)
+### 1) Rectangle / Ellipse / Diamond (rectangle / ellipse / diamond)
+- **Required**: \`type\`, \`x\`, \`y\`
+- **Optional**: \`width\`, \`height\`, \`strokeColor\`, \`backgroundColor\`, \`strokeWidth\`, \`strokeStyle\` (solid|dashed|dotted), \`fillStyle\` (hachure|solid|zigzag|cross-hatch), \`roughness\`, \`opacity\`, \`angle\` (rotation angle), \`roundness\` (border radius), \`locked\`, \`link\`
+- **Text Container**: Provide \`label.text\` to use as a text container. If \`width/height\` is not provided, the container size will be automatically calculated based on the label text.
+  - label optional properties: \`fontSize\`, \`fontFamily\`, \`strokeColor\`, \`textAlign\` (left|center|right), \`verticalAlign\` (top|middle|bottom)
 
-### 2) 文本（text）
-- **必填**：\`type\`, \`x\`, \`y\`, \`text\`
-- **自动**：\`width\`, \`height\` 由测量自动计算（不要手动提供）
-- **可选**：\`fontSize\`, \`fontFamily\` (1|2|3), \`strokeColor\` (文本颜色), \`opacity\`, \`angle\`, \`textAlign\` (left|center|right), \`verticalAlign\` (top|middle|bottom)
+### 2) Text (text)
+- **Required**: \`type\`, \`x\`, \`y\`, \`text\`
+- **Auto**: \`width\`, \`height\` are automatically calculated by measurement (do not provide manually)
+- **Optional**: \`fontSize\`, \`fontFamily\` (1|2|3), \`strokeColor\` (text color), \`opacity\`, \`angle\`, \`textAlign\` (left|center|right), \`verticalAlign\` (top|middle|bottom)
 
-### 3) 线（line）
-- **必填**：\`type\`, \`x\`, \`y\`
-- **可选**：\`width\`, \`height\`（默认 100×0），\`strokeColor\`, \`strokeWidth\`, \`strokeStyle\`, \`polygon\` (是否闭合)
-- **说明**：line 不支持 \`start/end\` 绑定；\`points\` 始终由系统生成。
+### 3) Line (line)
+- **Required**: \`type\`, \`x\`, \`y\`
+- **Optional**: \`width\`, \`height\` (default 100x0), \`strokeColor\`, \`strokeWidth\`, \`strokeStyle\`, \`polygon\` (whether closed)
+- **Note**: line does not support \`start/end\` binding; \`points\` are always generated by the system.
 
-### 4) 箭头（arrow）
-- **必填**：\`type\`, \`x\`, \`y\`
-- **可选**：\`width\`, \`height\`（默认 100×0），\`strokeColor\`, \`strokeWidth\`, \`strokeStyle\`, \`elbowed\` (肘形箭头)
-- **箭头头部**：\`startArrowhead\`/\`endArrowhead\` 可选值：arrow, bar, circle, circle_outline, triangle, triangle_outline, diamond, diamond_outline（默认 end=arrow，start 无）
-- **绑定**（仅 arrow 支持）：\`start\`/\`end\` 可选；若提供，必须包含 \`type\` 或 \`id\` 之一
-  - 通过 \`type\` 自动创建：支持 rectangle/ellipse/diamond/text（text 需 \`text\`）
-  - 通过 \`id\` 绑定已有元素
-  - 可选提供 x/y/width/height，未提供时按箭头位置自动推断
-- **标签**：可提供 \`label.text\` 为箭头添加标签
-- **禁止**：不要传 \`points\`（系统根据 width/height 自动生成并归一化）
+### 4) Arrow (arrow)
+- **Required**: \`type\`, \`x\`, \`y\`
+- **Optional**: \`width\`, \`height\` (default 100x0), \`strokeColor\`, \`strokeWidth\`, \`strokeStyle\`, \`elbowed\` (elbow arrow)
+- **Arrowheads**: \`startArrowhead\`/\`endArrowhead\` options: arrow, bar, circle, circle_outline, triangle, triangle_outline, diamond, diamond_outline (default end=arrow, start=none)
+- **Binding** (arrow only): \`start\`/\`end\` are optional; if provided, must include either \`type\` or \`id\`
+  - Auto-create via \`type\`: supports rectangle/ellipse/diamond/text (text requires \`text\`)
+  - Bind to existing element via \`id\`
+  - Optionally provide x/y/width/height; if not provided, automatically inferred from arrow position
+- **Label**: Provide \`label.text\` to add a label to the arrow
+- **Forbidden**: Do not pass \`points\` (the system automatically generates and normalizes based on width/height)
 
-### 5) 自由绘制（freedraw）
-- **必填**：\`type\`, \`x\`, \`y\`
-- **可选**：\`strokeColor\`, \`strokeWidth\`, \`opacity\`
-- **说明**：\`points\` 由系统生成，用于手绘风格线条。
+### 5) Freedraw (freedraw)
+- **Required**: \`type\`, \`x\`, \`y\`
+- **Optional**: \`strokeColor\`, \`strokeWidth\`, \`opacity\`
+- **Note**: \`points\` are generated by the system, used for freehand-style lines.
 
-### 6) 图片（image）
-- **必填**：\`type\`, \`x\`, \`y\`, \`fileId\`
-- **可选**：\`width\`, \`height\`, \`scale\` (翻转), \`crop\` (裁剪), \`angle\`, \`locked\`, \`link\`
+### 6) Image (image)
+- **Required**: \`type\`, \`x\`, \`y\`, \`fileId\`
+- **Optional**: \`width\`, \`height\`, \`scale\` (flip), \`crop\` (crop), \`angle\`, \`locked\`, \`link\`
 
-### 7) 框架（frame）
-- **必填**：\`type\`, \`children\`（元素 id 列表）
-- **可选**：\`x\`, \`y\`, \`width\`, \`height\`, \`name\`
-- **说明**：若未提供坐标/尺寸，系统会依据 children 自动计算，并包含 10px 内边距。
+### 7) Frame (frame)
+- **Required**: \`type\`, \`children\` (list of element ids)
+- **Optional**: \`x\`, \`y\`, \`width\`, \`height\`, \`name\`
+- **Note**: If coordinates/dimensions are not provided, the system will automatically calculate them based on children, with 10px inner padding.
 
-### 8) 通用属性
-- **分组**：使用 \`groupIds\` 数组将多个元素组合在一起
-- **锁定**：\`locked: true\` 防止元素被编辑
-- **链接**：\`link\` 为元素添加超链接
+### 8) General Properties
+- **Grouping**: Use \`groupIds\` array to group multiple elements together
+- **Locking**: \`locked: true\` prevents the element from being edited
+- **Linking**: \`link\` adds a hyperlink to the element
 
-## 高质量 ExcalidrawElementSkeleton 用例
+## High-Quality ExcalidrawElementSkeleton Examples
 
-### 1) 基础形状
+### 1) Basic Shapes
 \`\`\`json
 [{
   "type": "rectangle",
@@ -138,42 +138,42 @@ export const SYSTEM_PROMPT = `## 任务
 }]
 \`\`\`
 
-### 2) 文本（自动测量尺寸）
+### 2) Text (Auto-Measured Size)
 \`\`\`json
 [{
   "type": "text",
   "x": 100,
   "y": 100,
-  "text": "标题文本",
+  "text": "Title Text",
   "fontSize": 20
 }]
 \`\`\`
 
-### 3) 文本容器（容器尺寸自动基于标签文本）
+### 3) Text Container (Container Size Auto-Calculated Based on Label Text)
 \`\`\`json
 [{
   "type": "rectangle",
   "x": 100,
   "y": 150,
-  "label": { "text": "项目管理", "fontSize": 18 },
+  "label": { "text": "Project Management", "fontSize": 18 },
   "backgroundColor": "#e8f5e9"
 }]
 \`\`\`
 
-### 4) 箭头 + 标签 + 自动创建绑定
+### 4) Arrow + Label + Auto-Created Binding
 \`\`\`json
 [{
   "type": "arrow",
   "x": 255,
   "y": 239,
-  "label": { "text": "影响" },
+  "label": { "text": "Affects" },
   "start": { "type": "rectangle" },
   "end": { "type": "ellipse" },
   "strokeColor": "#2e7d32"
 }]
 \`\`\`
 
-### 5) 线/箭头（附加属性）
+### 5) Line/Arrow (Additional Properties)
 \`\`\`json
 [
   { "type": "arrow", "x": 450, "y": 20, "startArrowhead": "dot", "endArrowhead": "triangle", "strokeColor": "#1971c2", "strokeWidth": 2 },
@@ -181,7 +181,7 @@ export const SYSTEM_PROMPT = `## 任务
 ]
 \`\`\`
 
-### 6) 文本容器（高级排版）
+### 6) Text Container (Advanced Typography)
 \`\`\`json
 [
   { "type": "diamond", "x": -120, "y": 100, "width": 270, "backgroundColor": "#fff3bf", "strokeWidth": 2, "label": { "text": "STYLED DIAMOND TEXT CONTAINER", "strokeColor": "#099268", "fontSize": 20 } },
@@ -190,7 +190,7 @@ export const SYSTEM_PROMPT = `## 任务
 ]
 \`\`\`
 
-### 7) 箭头绑定文本端点（通过 type）
+### 7) Arrow Binding to Text Endpoints (via type)
 \`\`\`json
 {
   "type": "arrow",
@@ -201,7 +201,7 @@ export const SYSTEM_PROMPT = `## 任务
 }
 \`\`\`
 
-### 8) 通过 id 绑定已有元素
+### 8) Binding to Existing Elements via id
 \`\`\`json
 [
   { "type": "ellipse", "id": "ellipse-1", "strokeColor": "#66a80f", "x": 390, "y": 356, "width": 150, "height": 150, "backgroundColor": "#d8f5a2" },
@@ -211,12 +211,12 @@ export const SYSTEM_PROMPT = `## 任务
 ]
 \`\`\`
 
-### 9) 框架（children 必填；坐标/尺寸可自动计算）
+### 9) Frame (children required; coordinates/dimensions auto-calculated)
 \`\`\`json
 [
   { "type": "rectangle", "id": "rect-1", "x": 10, "y": 10 },
   { "type": "diamond", "id": "diamond-1", "x": 120, "y": 20 },
-  { "type": "frame", "children": ["rect-1", "diamond-1"], "name": "功能模块组" }
+  { "type": "frame", "children": ["rect-1", "diamond-1"], "name": "Feature Module Group" }
 ]
 \`\`\`
 `;
@@ -224,185 +224,185 @@ export const SYSTEM_PROMPT = `## 任务
 // Chart type display names mapping
 // Only includes chart types that have corresponding visual specifications
 const CHART_TYPE_NAMES = {
-  auto: '自动',
-  flowchart: '流程图',
-  mindmap: '思维导图',
-  orgchart: '组织架构图',
-  sequence: '时序图',
-  class: 'UML类图',
-  er: 'ER图',
-  gantt: '甘特图',
-  timeline: '时间线',
-  tree: '树形图',
-  network: '网络拓扑图',
-  architecture: '架构图',
-  dataflow: '数据流图',
-  state: '状态图',
-  swimlane: '泳道图',
-  concept: '概念图',
-  fishbone: '鱼骨图',
-  swot: 'SWOT分析图',
-  pyramid: '金字塔图',
-  funnel: '漏斗图',
-  venn: '韦恩图',
-  matrix: '矩阵图',
-  infographic: '信息图',
+  auto: 'Auto',
+  flowchart: 'Flowchart',
+  mindmap: 'Mind Map',
+  orgchart: 'Org Chart',
+  sequence: 'Sequence Diagram',
+  class: 'UML Class Diagram',
+  er: 'ER Diagram',
+  gantt: 'Gantt Chart',
+  timeline: 'Timeline',
+  tree: 'Tree Diagram',
+  network: 'Network Topology',
+  architecture: 'Architecture Diagram',
+  dataflow: 'Data Flow Diagram',
+  state: 'State Diagram',
+  swimlane: 'Swimlane Diagram',
+  concept: 'Concept Map',
+  fishbone: 'Fishbone Diagram',
+  swot: 'SWOT Analysis',
+  pyramid: 'Pyramid Diagram',
+  funnel: 'Funnel Diagram',
+  venn: 'Venn Diagram',
+  matrix: 'Matrix Diagram',
+  infographic: 'Infographic',
 };
 
 // Visual specifications for different chart types
 const CHART_VISUAL_SPECS = {
   flowchart: `
-### 流程图视觉规范
-- **形状约定**：开始/结束用 ellipse，处理步骤用 rectangle，判断用 diamond
-- **连接**：使用 arrow 连接各节点，箭头需绑定到元素
-- **布局**：自上而下或从左到右的流向，保持清晰的流程方向
-- **色彩**：使用蓝色系作为主色调，决策点可用橙色突出`,
+### Flowchart Visual Specification
+- **Shape Conventions**: Use ellipse for start/end, rectangle for processing steps, diamond for decisions
+- **Connections**: Use arrow to connect nodes, arrows must be bound to elements
+- **Layout**: Top-to-bottom or left-to-right flow, maintain clear flow direction
+- **Colors**: Use blue tones as the primary color scheme, decision points can be highlighted in orange`,
 
   mindmap: `
-### 思维导图视觉规范
-- **结构**：中心主题用 ellipse，分支用 rectangle
-- **层级**：通过尺寸和颜色深浅体现层级关系
-- **布局**：放射状布局，主分支均匀分布在中心周围
-- **色彩**：每个主分支使用不同色系，便于区分主题`,
+### Mind Map Visual Specification
+- **Structure**: Central topic uses ellipse, branches use rectangle
+- **Hierarchy**: Reflect hierarchy through size and color depth
+- **Layout**: Radial layout, main branches evenly distributed around the center
+- **Colors**: Each main branch uses a different color scheme for easy topic differentiation`,
 
   orgchart: `
-### 组织架构图视觉规范
-- **形状**：统一使用 rectangle 表示人员或职位
-- **层级**：通过颜色深浅和尺寸体现职级高低
-- **布局**：严格的树形层级结构，自上而下
-- **连接**：使用 arrow 垂直向下连接上下级关系`,
+### Org Chart Visual Specification
+- **Shapes**: Uniformly use rectangle to represent people or positions
+- **Hierarchy**: Reflect rank levels through color depth and size
+- **Layout**: Strict tree-structured hierarchy, top to bottom
+- **Connections**: Use arrow to vertically connect superior-subordinate relationships`,
 
   sequence: `
-### 时序图视觉规范
-- **参与者**：顶部使用 rectangle 表示各参与者
-- **生命线**：使用虚线 line 从参与者向下延伸
-- **消息**：使用 arrow 表示消息传递，label 标注消息内容
-- **布局**：参与者横向排列，消息按时间从上到下`,
+### Sequence Diagram Visual Specification
+- **Participants**: Use rectangle at the top to represent each participant
+- **Lifelines**: Use dashed line extending downward from participants
+- **Messages**: Use arrow to represent message passing, label to annotate message content
+- **Layout**: Participants arranged horizontally, messages flow top to bottom chronologically`,
 
   class: `
-### UML类图视觉规范
-- **类**：使用 rectangle 分三部分（类名、属性、方法）
-- **关系**：继承用空心三角箭头，关联用普通箭头，聚合/组合用菱形箭头
-- **布局**：父类在上，子类在下，相关类横向排列`,
+### UML Class Diagram Visual Specification
+- **Classes**: Use rectangle divided into three sections (class name, attributes, methods)
+- **Relationships**: Inheritance uses hollow triangle arrowhead, association uses regular arrow, aggregation/composition uses diamond arrowhead
+- **Layout**: Parent classes on top, subclasses below, related classes arranged horizontally`,
 
   er: `
-### ER图视觉规范
-- **实体**：使用 rectangle 表示实体
-- **属性**：使用 ellipse 表示属性，主键可用特殊样式标识
-- **关系**：使用 diamond 表示关系，用 arrow 连接
-- **基数**：在连接线上标注关系基数（1, N, M等）`,
+### ER Diagram Visual Specification
+- **Entities**: Use rectangle to represent entities
+- **Attributes**: Use ellipse to represent attributes, primary keys can use special styling
+- **Relationships**: Use diamond to represent relationships, connect with arrow
+- **Cardinality**: Annotate relationship cardinality on connection lines (1, N, M, etc.)`,
 
   gantt: `
-### 甘特图视觉规范
-- **时间轴**：顶部标注时间刻度
-- **任务条**：使用 rectangle 表示任务，长度表示时间跨度
-- **状态**：用不同颜色区分任务状态（未开始、进行中、已完成）
-- **布局**：任务纵向排列，时间横向展开`,
+### Gantt Chart Visual Specification
+- **Timeline**: Annotate time scale at the top
+- **Task Bars**: Use rectangle to represent tasks, length represents time span
+- **Status**: Use different colors to distinguish task status (not started, in progress, completed)
+- **Layout**: Tasks arranged vertically, time extends horizontally`,
 
   timeline: `
-### 时间线视觉规范
-- **主轴**：使用 line 作为时间主轴
-- **节点**：使用 ellipse 标记时间节点
-- **事件**：使用 rectangle 展示事件内容
-- **布局**：时间轴居中，事件卡片交错分布在两侧`,
+### Timeline Visual Specification
+- **Main Axis**: Use line as the main timeline axis
+- **Nodes**: Use ellipse to mark time nodes
+- **Events**: Use rectangle to display event content
+- **Layout**: Timeline centered, event cards alternately distributed on both sides`,
 
   tree: `
-### 树形图视觉规范
-- **节点**：根节点用 ellipse，其他节点用 rectangle
-- **层级**：通过颜色渐变体现层级深度
-- **连接**：使用 arrow 从父节点指向子节点
-- **布局**：根节点在顶部，子节点均匀分布`,
+### Tree Diagram Visual Specification
+- **Nodes**: Root node uses ellipse, other nodes use rectangle
+- **Hierarchy**: Reflect hierarchy depth through color gradients
+- **Connections**: Use arrow pointing from parent node to child node
+- **Layout**: Root node at the top, child nodes evenly distributed`,
 
   network: `
-### 网络拓扑图视觉规范
-- **设备**：不同设备类型使用不同形状（rectangle、ellipse、diamond）
-- **层级**：通过颜色和尺寸区分设备重要性
-- **连接**：使用 line 表示网络连接，线宽可表示带宽
-- **布局**：核心设备居中，其他设备按层级或功能分组`,
+### Network Topology Visual Specification
+- **Devices**: Different device types use different shapes (rectangle, ellipse, diamond)
+- **Hierarchy**: Distinguish device importance through color and size
+- **Connections**: Use line to represent network connections, line width can indicate bandwidth
+- **Layout**: Core devices centered, other devices grouped by tier or function`,
 
   architecture: `
-### 架构图视觉规范
-- **分层**：使用 rectangle 区分不同层级（表示层、业务层、数据层等）
-- **组件**：使用 rectangle 表示组件或服务
-- **布局**：分层布局，自上而下`,
+### Architecture Diagram Visual Specification
+- **Layering**: Use rectangle to distinguish different layers (presentation layer, business layer, data layer, etc.)
+- **Components**: Use rectangle to represent components or services
+- **Layout**: Layered layout, top to bottom`,
 
   dataflow: `
-### 数据流图视觉规范
-- **实体**：外部实体用 rectangle，处理过程用 ellipse
-- **存储**：数据存储用特殊样式的 rectangle
-- **数据流**：使用 arrow 表示数据流向，label 标注数据名称
-- **布局**：外部实体在边缘，处理过程居中`,
+### Data Flow Diagram Visual Specification
+- **Entities**: External entities use rectangle, processes use ellipse
+- **Storage**: Data stores use specially styled rectangle
+- **Data Flow**: Use arrow to indicate data flow direction, label to annotate data names
+- **Layout**: External entities on the edges, processes centered`,
 
   state: `
-### 状态图视觉规范
-- **状态**：使用 rectangle 带圆角表示状态
-- **初始/终止**：初始状态用实心圆，终止状态用双圆圈
-- **转换**：使用 arrow 表示状态转换，label 标注触发条件
-- **布局**：按状态转换的逻辑流程排列`,
+### State Diagram Visual Specification
+- **States**: Use rectangle with rounded corners to represent states
+- **Initial/Terminal**: Initial state uses filled circle, terminal state uses double circle
+- **Transitions**: Use arrow to represent state transitions, label to annotate trigger conditions
+- **Layout**: Arranged according to the logical flow of state transitions`,
 
   swimlane: `
-### 泳道图视觉规范
-- **泳道**：使用 rectangle 或 frame 划分泳道，每个泳道代表一个角色或部门
-- **活动**：使用 rectangle 表示活动，diamond 表示决策
-- **流程**：使用 arrow 连接活动，可跨越泳道
-- **布局**：泳道平行排列，活动按时间顺序排列`,
+### Swimlane Diagram Visual Specification
+- **Swimlanes**: Use rectangle or frame to divide swimlanes, each lane represents a role or department
+- **Activities**: Use rectangle for activities, diamond for decisions
+- **Flow**: Use arrow to connect activities, can cross swimlanes
+- **Layout**: Swimlanes arranged in parallel, activities ordered chronologically`,
 
   concept: `
-### 概念图视觉规范
-- **概念**：核心概念用 ellipse，其他概念用 rectangle
-- **关系**：使用 arrow 连接概念，label 标注关系类型
-- **层级**：通过尺寸和颜色体现概念的重要性
-- **布局**：核心概念居中，相关概念围绕分布`,
+### Concept Map Visual Specification
+- **Concepts**: Core concepts use ellipse, other concepts use rectangle
+- **Relationships**: Use arrow to connect concepts, label to annotate relationship types
+- **Hierarchy**: Reflect concept importance through size and color
+- **Layout**: Core concept centered, related concepts distributed around it`,
 
   fishbone: `
-### 鱼骨图视觉规范
-- **主干**：使用粗 arrow 作为主干，指向问题或结果
-- **分支**：使用 arrow 作为分支，斜向连接到主干
-- **分类**：主要分支使用不同颜色区分类别
-- **布局**：从左到右，分支交替分布在主干上下`,
+### Fishbone Diagram Visual Specification
+- **Backbone**: Use thick arrow as the backbone, pointing to the problem or result
+- **Branches**: Use arrow as branches, connecting diagonally to the backbone
+- **Categories**: Main branches use different colors to distinguish categories
+- **Layout**: Left to right, branches alternately distributed above and below the backbone`,
 
   swot: `
-### SWOT分析图视觉规范
-- **四象限**：使用 rectangle 创建四个象限
-- **分类**：优势(S)、劣势(W)、机会(O)、威胁(T) 使用不同颜色
-- **内容**：每个象限内列出相关要点
-- **布局**：2x2 矩阵布局，四个象限等大`,
+### SWOT Analysis Visual Specification
+- **Four Quadrants**: Use rectangle to create four quadrants
+- **Categories**: Strengths (S), Weaknesses (W), Opportunities (O), Threats (T) use different colors
+- **Content**: List relevant points within each quadrant
+- **Layout**: 2x2 matrix layout, four quadrants of equal size`,
 
   pyramid: `
-### 金字塔图视觉规范
-- **层级**：使用 rectangle 表示各层，宽度从上到下递增
-- **颜色**：使用渐变色体现层级关系
-- **布局**：垂直居中对齐，形成金字塔形状`,
+### Pyramid Diagram Visual Specification
+- **Levels**: Use rectangle to represent each level, width increases from top to bottom
+- **Colors**: Use gradient colors to reflect hierarchy relationships
+- **Layout**: Vertically center-aligned, forming a pyramid shape`,
 
   funnel: `
-### 漏斗图视觉规范
-- **层级**：使用 rectangle 表示各阶段，宽度从上到下递减
-- **数据**：标注每层的数量或百分比
-- **颜色**：使用渐变色表示转化过程
-- **布局**：垂直居中，形成漏斗形状`,
+### Funnel Diagram Visual Specification
+- **Stages**: Use rectangle to represent each stage, width decreases from top to bottom
+- **Data**: Annotate quantity or percentage for each layer
+- **Colors**: Use gradient colors to represent the conversion process
+- **Layout**: Vertically centered, forming a funnel shape`,
 
   venn: `
-### 韦恩图视觉规范
-- **集合**：使用 ellipse 表示集合，部分重叠
-- **颜色**：使用半透明背景色，交集区域颜色自然混合
-- **标签**：标注集合名称和元素
-- **布局**：圆形适当重叠，形成明显的交集区域`,
+### Venn Diagram Visual Specification
+- **Sets**: Use ellipse to represent sets, partially overlapping
+- **Colors**: Use semi-transparent background colors, intersection areas blend naturally
+- **Labels**: Annotate set names and elements
+- **Layout**: Circles appropriately overlapping, forming distinct intersection areas`,
 
   matrix: `
-### 矩阵图视觉规范
-- **网格**：使用 rectangle 创建行列网格
-- **表头**：使用深色背景区分表头
-- **数据**：单元格可用颜色深浅表示数值大小
-- **布局**：规整的矩阵结构，行列对齐`,
+### Matrix Diagram Visual Specification
+- **Grid**: Use rectangle to create row and column grids
+- **Headers**: Use dark backgrounds to distinguish headers
+- **Data**: Cell color depth can represent data magnitude
+- **Layout**: Uniform matrix structure, rows and columns aligned`,
 
   infographic: `
-### 信息图视觉规范
-- **模块化**：使用 frame 和 rectangle 创建独立的信息模块
-- **视觉层次**：通过尺寸、颜色和位置建立清晰的信息层次
-- **数据可视化**：包含图表、图标、数字等视觉元素
-- **色彩丰富**：使用多种颜色区分不同信息模块，保持视觉吸引力
-- **图文结合**：文本与图形元素紧密结合，提高信息传达效率
-- **布局灵活**：可根据内容需要采用网格、卡片或自由布局`,
+### Infographic Visual Specification
+- **Modular**: Use frame and rectangle to create independent information modules
+- **Visual Hierarchy**: Establish clear information hierarchy through size, color, and position
+- **Data Visualization**: Include charts, icons, numbers, and other visual elements
+- **Rich Colors**: Use multiple colors to distinguish different information modules while maintaining visual appeal
+- **Text-Visual Integration**: Text and graphic elements tightly combined to improve information delivery efficiency
+- **Flexible Layout**: Adopt grid, card, or free layout as needed based on content`,
 
 };
 
@@ -422,60 +422,59 @@ export const USER_PROMPT_TEMPLATE = (userInput, chartType = 'auto') => {
     // Only proceed if the chart type is valid and has a display name
     if (chartTypeName) {
       // Add chart type instruction
-      promptParts.push(`请创建一个${chartTypeName}类型的 Excalidraw 图表。`);
+      promptParts.push(`Please create an Excalidraw diagram of type: ${chartTypeName}.`);
 
       // Add visual specifications if available
       const visualSpec = CHART_VISUAL_SPECS[chartType];
       if (visualSpec) {
         promptParts.push(visualSpec.trim());
         promptParts.push(
-          `请严格遵循以上视觉规范来设计图表，确保：\n` +
-          `- 使用规范中指定的形状类型和颜色\n` +
-          `- 遵循规范中的布局要求\n` +
-          `- 应用规范中的样式属性（strokeWidth、fontSize等）\n` +
-          `- 保持视觉一致性和专业性`
+          `Please strictly follow the above visual specifications to design the chart, ensuring:\n` +
+          `- Use the shape types and colors specified in the specification\n` +
+          `- Follow the layout requirements in the specification\n` +
+          `- Apply the style properties from the specification (strokeWidth, fontSize, etc.)\n` +
+          `- Maintain visual consistency and professionalism`
         );
       }
     }
   } else {
     // Auto mode: let AI decide the best visualization
     promptParts.push(
-      '请根据用户需求，智能选择最合适的一种或多种图表类型来呈现信息。并绘制 Excalidraw 图像。\n\n' +
-      '## 可选图表类型\n' +
-      '- **流程图 (flowchart)**：适合展示流程、步骤、决策逻辑\n' +
-      '- **思维导图 (mindmap)**：适合展示概念关系、知识结构、头脑风暴\n' +
-      '- **组织架构图 (orgchart)**：适合展示组织结构、层级关系\n' +
-      '- **时序图 (sequence)**：适合展示系统交互、消息传递、时间顺序\n' +
-      '- **UML类图 (class)**：适合展示类结构、继承关系、面向对象设计\n' +
-      '- **ER图 (er)**：适合展示数据库实体关系、数据模型\n' +
-      '- **甘特图 (gantt)**：适合展示项目进度、任务时间安排\n' +
-      '- **时间线 (timeline)**：适合展示历史事件、发展历程\n' +
-      '- **树形图 (tree)**：适合展示层级结构、分类关系\n' +
-      '- **网络拓扑图 (network)**：适合展示网络结构、节点连接\n' +
-      '- **架构图 (architecture)**：适合展示系统架构、技术栈、分层设计\n' +
-      '- **数据流图 (dataflow)**：适合展示数据流转、处理过程\n' +
-      '- **状态图 (state)**：适合展示状态转换、生命周期\n' +
-      '- **泳道图 (swimlane)**：适合展示跨部门流程、职责划分\n' +
-      '- **概念图 (concept)**：适合展示概念关系、知识图谱\n' +
-      '- **鱼骨图 (fishbone)**：适合展示因果分析、问题根源\n' +
-      '- **SWOT分析图 (swot)**：适合展示优劣势分析、战略规划\n' +
-      '- **金字塔图 (pyramid)**：适合展示层级结构、优先级\n' +
-      '- **漏斗图 (funnel)**：适合展示转化流程、筛选过程\n' +
-      '- **韦恩图 (venn)**：适合展示集合关系、交集并集\n' +
-      '- **矩阵图 (matrix)**：适合展示多维对比、关系矩阵\n' +
-      '- **信息图 (infographic)**：适合展示数据可视化、信息展示、创意图表\n' +
-      '## 选择指南\n' +
-      '1. 分析用户需求的核心内容和目标\n' +
-      '2. 选择最能清晰表达信息的图表类型（可以是一种或多种组合）\n' +
-      '3. 如果选择了特定图表类型，请严格遵循该类型的视觉规范\n' +
-      '4. 确保图表能够独立传达信息，布局清晰美观'
+      'Based on user requirements, intelligently select the most appropriate chart type(s) to present the information, and draw the Excalidraw diagram.\n\n' +
+      '## Available Chart Types\n' +
+      '- **Flowchart (flowchart)**: Suitable for showing processes, steps, decision logic\n' +
+      '- **Mind Map (mindmap)**: Suitable for showing concept relationships, knowledge structures, brainstorming\n' +
+      '- **Org Chart (orgchart)**: Suitable for showing organizational structures, hierarchical relationships\n' +
+      '- **Sequence Diagram (sequence)**: Suitable for showing system interactions, message passing, chronological order\n' +
+      '- **UML Class Diagram (class)**: Suitable for showing class structures, inheritance relationships, object-oriented design\n' +
+      '- **ER Diagram (er)**: Suitable for showing database entity relationships, data models\n' +
+      '- **Gantt Chart (gantt)**: Suitable for showing project progress, task scheduling\n' +
+      '- **Timeline (timeline)**: Suitable for showing historical events, development history\n' +
+      '- **Tree Diagram (tree)**: Suitable for showing hierarchical structures, classification relationships\n' +
+      '- **Network Topology (network)**: Suitable for showing network structures, node connections\n' +
+      '- **Architecture Diagram (architecture)**: Suitable for showing system architecture, tech stacks, layered design\n' +
+      '- **Data Flow Diagram (dataflow)**: Suitable for showing data flow, processing workflows\n' +
+      '- **State Diagram (state)**: Suitable for showing state transitions, lifecycles\n' +
+      '- **Swimlane Diagram (swimlane)**: Suitable for showing cross-department processes, role assignments\n' +
+      '- **Concept Map (concept)**: Suitable for showing concept relationships, knowledge graphs\n' +
+      '- **Fishbone Diagram (fishbone)**: Suitable for showing cause-and-effect analysis, root cause identification\n' +
+      '- **SWOT Analysis (swot)**: Suitable for showing strengths/weaknesses analysis, strategic planning\n' +
+      '- **Pyramid Diagram (pyramid)**: Suitable for showing hierarchical structures, priorities\n' +
+      '- **Funnel Diagram (funnel)**: Suitable for showing conversion processes, filtering stages\n' +
+      '- **Venn Diagram (venn)**: Suitable for showing set relationships, intersections and unions\n' +
+      '- **Matrix Diagram (matrix)**: Suitable for showing multidimensional comparisons, relationship matrices\n' +
+      '- **Infographic (infographic)**: Suitable for showing data visualization, information presentation, creative charts\n' +
+      '## Selection Guide\n' +
+      '1. Analyze the core content and objectives of the user\'s requirements\n' +
+      '2. Select the chart type(s) that can most clearly express the information\n' +
+      '3. If a specific chart type is selected, strictly follow the visual specifications for that type\n' +
+      '4. Ensure the chart can independently convey information with a clear and attractive layout'
     );
   }
 
   // Add user input
-  promptParts.push(`用户需求：\n${userInput}`);
+  promptParts.push(`User requirements:\n${userInput}`);
 
   // Join all parts with double newlines for better readability
   return promptParts.join('\n\n');
 };
-

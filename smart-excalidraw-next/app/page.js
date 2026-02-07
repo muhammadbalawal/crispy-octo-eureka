@@ -85,17 +85,17 @@ export default function Home() {
   // Post-process Excalidraw code: remove markdown wrappers, repair closures, and fix unescaped quotes
   const postProcessExcalidrawCode = (code) => {
     if (!code || typeof code !== 'string') return code;
-    
+
     let processed = code.trim();
-    
+
     // Step 1: Remove markdown code fence wrappers (```json, ```javascript, ```js, or just ```)
     processed = processed.replace(/^```(?:json|javascript|js)?\s*\n?/i, '');
     processed = processed.replace(/\n?```\s*$/, '');
     processed = processed.trim();
-    
+
     // Step 1.5: Repair common JSON closure issues (missing quotes/brackets at end)
     processed = repairJsonClosure(processed);
-    
+
     // Step 2: Fix unescaped double quotes within JSON string values
     // This is a complex task - we need to be careful not to break valid JSON structure
     // Strategy: Parse the JSON structure and fix quotes only in string values
@@ -120,23 +120,23 @@ export default function Home() {
     let inString = false;
     let escapeNext = false;
     let currentQuotePos = -1;
-    
+
     for (let i = 0; i < jsonString.length; i++) {
       const char = jsonString[i];
       const prevChar = i > 0 ? jsonString[i - 1] : '';
-      
+
       if (escapeNext) {
         result += char;
         escapeNext = false;
         continue;
       }
-      
+
       if (char === '\\') {
         result += char;
         escapeNext = true;
         continue;
       }
-      
+
       if (char === '"') {
         if (!inString) {
           // Starting a string
@@ -148,7 +148,7 @@ export default function Home() {
           // Check if this is a structural quote (followed by : or , or } or ])
           const nextNonWhitespace = jsonString.slice(i + 1).match(/^\s*(.)/);
           const nextChar = nextNonWhitespace ? nextNonWhitespace[1] : '';
-          
+
           if (nextChar === ':' || nextChar === ',' || nextChar === '}' || nextChar === ']' || nextChar === '') {
             // This is a closing quote for the string
             inString = false;
@@ -162,7 +162,7 @@ export default function Home() {
         result += char;
       }
     }
-    
+
     return result;
   };
 
@@ -174,8 +174,8 @@ export default function Home() {
     if (!usePassword && !isConfigValid(config)) {
       setNotification({
         isOpen: true,
-        title: '配置提醒',
-        message: '请先配置您的 LLM 提供商或启用访问密码',
+        title: 'Config Reminder',
+        message: 'Please configure your LLM provider or enable access password first',
         type: 'warning'
       });
       setIsConfigManagerOpen(true);
@@ -207,7 +207,7 @@ export default function Home() {
 
       if (!response.ok) {
         // Parse error response body if available
-        let errorMessage = '生成代码失败';
+        let errorMessage = 'Failed to generate code';
         try {
           const errorData = await response.json();
           if (errorData.error) {
@@ -217,22 +217,22 @@ export default function Home() {
           // If response body is not JSON, use status-based messages
           switch (response.status) {
             case 400:
-              errorMessage = '请求参数错误，请检查输入内容';
+              errorMessage = 'Invalid request parameters, please check your input';
               break;
             case 401:
             case 403:
-              errorMessage = 'API 密钥无效或权限不足，请检查配置';
+              errorMessage = 'Invalid API key or insufficient permissions, please check config';
               break;
             case 429:
-              errorMessage = '请求过于频繁，请稍后再试';
+              errorMessage = 'Too many requests, please try again later';
               break;
             case 500:
             case 502:
             case 503:
-              errorMessage = '服务器错误，请稍后重试';
+              errorMessage = 'Server error, please try again later';
               break;
             default:
-              errorMessage = `请求失败 (${response.status})`;
+              errorMessage = `Request failed (${response.status})`;
           }
         }
         throw new Error(errorMessage);
@@ -269,7 +269,7 @@ export default function Home() {
             } catch (e) {
               // SSE parsing errors - show to user
               if (e.message && !e.message.includes('Unexpected')) {
-                setApiError('数据流解析错误：' + e.message);
+                setApiError('Stream parsing error: ' + e.message);
               }
               console.error('Failed to parse SSE:', e);
             }
@@ -303,7 +303,7 @@ export default function Home() {
       console.error('Error generating code:', error);
       // Check if it's a network error
       if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
-        setApiError('网络连接失败，请检查网络连接');
+        setApiError('Network connection failed, please check your connection');
       } else {
         setApiError(error.message);
       }
@@ -324,7 +324,7 @@ export default function Home() {
       // Extract array from code if wrapped in other text
       const arrayMatch = cleanedCode.match(/\[[\s\S]*\]/);
       if (!arrayMatch) {
-        setJsonError('代码中未找到有效的 JSON 数组');
+        setJsonError('No valid JSON array found in code');
         console.error('No array found in generated code');
         return;
       }
@@ -338,9 +338,9 @@ export default function Home() {
       console.error('Failed to parse generated code:', error);
       // Extract native JSON error message
       if (error instanceof SyntaxError) {
-        setJsonError('JSON 语法错误：' + error.message);
+        setJsonError('JSON syntax error: ' + error.message);
       } else {
-        setJsonError('解析失败：' + error.message);
+        setJsonError('Parse failed: ' + error.message);
       }
     }
   };
@@ -391,7 +391,7 @@ export default function Home() {
   const handleApplyHistory = (history) => {
     // Ensure userInput is always a string when setting current input
     const userInputText = typeof history.userInput === 'object'
-      ? (history.userInput.text || '图片上传生成')
+      ? (history.userInput.text || 'Generated from image upload')
       : history.userInput;
 
     setCurrentInput(userInputText);
@@ -409,10 +409,10 @@ export default function Home() {
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (!isResizingHorizontal) return;
-      
+
       const percentage = (e.clientX / window.innerWidth) * 100;
-      
-      // 可调节的范围
+
+      // Adjustable range
       setLeftPanelWidth(Math.min(Math.max(percentage, 20), 80));
     };
 
@@ -437,14 +437,14 @@ export default function Home() {
       <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
         <div>
           <h1 className="text-lg font-semibold text-gray-900">Smart Excalidraw</h1>
-          <p className="text-xs text-gray-500">AI 驱动的图表生成</p>
+          <p className="text-xs text-gray-500">AI-Powered Diagram Generation</p>
         </div>
         <div className="flex items-center space-x-3">
           {(usePassword || (config && isConfigValid(config))) && (
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-green-50 rounded border border-green-300">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
               <span className="text-xs text-green-900 font-medium">
-                {usePassword ? '密码访问' : `${config.name || config.type} - ${config.model}`}
+                {usePassword ? 'Password Access' : `${config.name || config.type} - ${config.model}`}
               </span>
             </div>
           )}
@@ -453,19 +453,19 @@ export default function Home() {
               onClick={() => setIsHistoryModalOpen(true)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200"
             >
-              历史记录
+              History
             </button>
             <button
               onClick={() => setIsAccessPasswordModalOpen(true)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200"
             >
-              访问密码
+              Access Password
             </button>
             <button
               onClick={() => setIsConfigManagerOpen(true)}
               className="px-4 py-2 text-sm font-medium text-white bg-gray-900 border border-gray-900 rounded hover:bg-gray-800 transition-colors duration-200"
             >
-              管理配置
+              Manage Configs
             </button>
           </div>
         </div>
@@ -483,7 +483,7 @@ export default function Home() {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium text-red-800">请求失败</p>
+                  <p className="text-xs font-medium text-red-800">Request Failed</p>
                   <p className="text-xs text-red-700 mt-1 break-words">{apiError}</p>
                 </div>
               </div>
@@ -549,7 +549,7 @@ export default function Home() {
         <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
           <span>Smart Excalidraw v0.1.0</span>
           <span className="text-gray-400">|</span>
-          <span>AI 驱动的智能图表生成工具</span>
+          <span>AI-Powered Smart Diagram Generation Tool</span>
           <span className="text-gray-400">|</span>
           <a
             href="https://github.com/liujuntao123/smart-excalidraw-next"
@@ -570,7 +570,7 @@ export default function Home() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <span>联系作者</span>
+            <span>Contact Author</span>
           </button>
           {/* <button onClick={() => setIsContactModalOpen(true)} >
           <span className="text-orange-500 font-medium">🎁 进群限时领取免费 claude-4.5-sonnet key</span>
@@ -611,11 +611,11 @@ export default function Home() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 overflow-hidden">
             <div className="px-6 py-4 bg-blue-600">
-              <h2 className="text-xl font-semibold text-white">公告</h2>
+              <h2 className="text-xl font-semibold text-white">Announcement</h2>
             </div>
             <div className="px-6 py-6">
               <p className="text-gray-700 text-base leading-relaxed">
-                本网站将迁移至更全面强大的新版本：
+                This website will migrate to a more comprehensive and powerful new version:
                 <a
                   href="https://ai-draw-nexus.aizhi.site/"
                   target="_blank"
@@ -631,7 +631,7 @@ export default function Home() {
                 onClick={() => setIsAnnouncementModalOpen(false)}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
               >
-                我知道了
+                Got it
               </button>
             </div>
           </div>

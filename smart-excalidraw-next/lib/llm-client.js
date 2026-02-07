@@ -254,19 +254,19 @@ export async function testConnection(config) {
     if (models && models.length > 0) {
       return {
         success: true,
-        message: `连接成功，找到 ${models.length} 个可用模型`,
+        message: `Connection successful, found ${models.length} available models`,
         models: models.slice(0, 5) // Return first 5 models for preview
       };
     } else {
       return {
         success: false,
-        message: '连接成功但未找到可用模型'
+        message: 'Connection successful but no available models found'
       };
     }
   } catch (error) {
     return {
       success: false,
-      message: `连接失败: ${error.message}`
+      message: `Connection failed: ${error.message}`
     };
   }
 }

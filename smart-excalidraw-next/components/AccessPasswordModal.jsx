@@ -20,7 +20,7 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
 
   const handleValidate = async () => {
     if (!password) {
-      setMessage('请输入访问密码');
+      setMessage('Please enter an access password');
       setMessageType('error');
       return;
     }
@@ -38,14 +38,14 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
       const data = await response.json();
 
       if (data.valid) {
-        setMessage('密码验证成功');
+        setMessage('Password verified successfully');
         setMessageType('success');
       } else {
-        setMessage(data.message || '密码验证失败');
+        setMessage(data.message || 'Password verification failed');
         setMessageType('error');
       }
     } catch (error) {
-      setMessage('验证请求失败');
+      setMessage('Verification request failed');
       setMessageType('error');
     } finally {
       setIsValidating(false);
@@ -62,7 +62,7 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
         detail: { usePassword }
       }));
     }
-    setMessage('设置已保存');
+    setMessage('Settings saved');
     setMessageType('success');
     setTimeout(() => {
       onClose();
@@ -83,7 +83,7 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
       <div className="relative bg-white rounded border border-gray-300 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">访问密码设置</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Access Password Settings</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -109,21 +109,21 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
           )}
 
           <div className="px-4 py-3 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800 font-medium mb-1">提示：</p>
-            <p className="text-sm text-blue-800">• 访问密码优先级高于前端LLM配置</p>
-            <p className="text-sm text-blue-800">• 启用后将使用服务器端配置的LLM</p>
+            <p className="text-sm text-blue-800 font-medium mb-1">Note:</p>
+            <p className="text-sm text-blue-800">• Access password takes priority over frontend LLM config</p>
+            <p className="text-sm text-blue-800">• When enabled, server-side LLM configuration will be used</p>
           </div>
 
           {/* Password Input */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              访问密码
+              Access Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="请输入访问密码"
+              placeholder="Enter access password"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -137,14 +137,14 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
                 onChange={(e) => setUsePassword(e.target.checked)}
                 className="mr-2"
               />
-              <span className="text-sm text-gray-700">启用访问密码</span>
+              <span className="text-sm text-gray-700">Enable access password</span>
             </label>
             <button
               onClick={handleValidate}
               disabled={isValidating}
               className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors duration-200 font-medium"
             >
-              {isValidating ? '验证中...' : '验证密码'}
+              {isValidating ? 'Validating...' : 'Validate Password'}
             </button>
           </div>
         </div>
@@ -155,13 +155,13 @@ export default function AccessPasswordModal({ isOpen, onClose }) {
             onClick={onClose}
             className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={handleSave}
             className="px-4 py-2 text-white bg-gray-900 rounded hover:bg-gray-800 transition-colors duration-200"
           >
-            保存
+            Save
           </button>
         </div>
       </div>

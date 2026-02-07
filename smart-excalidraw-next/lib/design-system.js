@@ -1,4 +1,4 @@
-// Design System - 统一的设计变量和样式类
+// Design System - Unified design variables and style classes
 
 export const colors = {
   primary: {

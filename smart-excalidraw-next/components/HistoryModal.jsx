@@ -33,8 +33,8 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
   const handleDelete = (id) => {
     setConfirmDialog({
       isOpen: true,
-      title: '确认删除',
-      message: '确定要删除这条历史记录吗？',
+      title: 'Confirm Delete',
+      message: 'Are you sure you want to delete this history record?',
       onConfirm: () => {
         historyManager.deleteHistory(id);
         loadHistories();
@@ -45,8 +45,8 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
   const handleClearAll = () => {
     setConfirmDialog({
       isOpen: true,
-      title: '确认清空',
-      message: '确定要清空所有历史记录吗？此操作不可恢复。',
+      title: 'Confirm Clear',
+      message: 'Are you sure you want to clear all history? This action cannot be undone.',
       onConfirm: () => {
         historyManager.clearAll();
         loadHistories();
@@ -58,7 +58,7 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
     if (!text) return '';
     // Handle case where text might be an object (for image uploads)
     if (typeof text === 'object') {
-      return text.text || '图片上传生成';
+      return text.text || 'Generated from image upload';
     }
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   };
@@ -71,7 +71,7 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
 
       <div className="relative bg-white rounded border border-gray-300 w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">历史记录</h2>
+          <h2 className="text-lg font-semibold text-gray-900">History</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -89,7 +89,7 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
                 onClick={handleClearAll}
                 className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
               >
-                清空全部
+                Clear All
               </button>
             </div>
           )}
@@ -97,7 +97,7 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
           <div className="space-y-3">
             {histories.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                暂无历史记录
+                No history records
               </div>
             ) : (
               histories.map((history) => (
@@ -120,7 +120,7 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
                       </p>
                       {history.config && (
                         <div className="text-xs text-gray-500">
-                          模型: {history.config.name} - {history.config.model}
+                          Model: {history.config.name} - {history.config.model}
                         </div>
                       )}
                     </div>
@@ -129,13 +129,13 @@ export default function HistoryModal({ isOpen, onClose, onApply }) {
                         onClick={() => handleApply(history)}
                         className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
                       >
-                        应用
+                        Apply
                       </button>
                       <button
                         onClick={() => handleDelete(history.id)}
                         className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                       >
-                        删除
+                        Delete
                       </button>
                     </div>
                   </div>

@@ -7,10 +7,10 @@ export default function ConfirmDialog({
   isOpen,
   onClose,
   onConfirm,
-  title = '确认操作',
+  title = 'Confirm Action',
   message,
-  confirmText = '确认',
-  cancelText = '取消',
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
   type = 'warning'
 }) {
   const typeStyles = {

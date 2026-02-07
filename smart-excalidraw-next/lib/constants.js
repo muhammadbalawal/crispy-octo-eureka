@@ -1,29 +1,29 @@
-// 统一的常量定义
+// Unified constant definitions
 
 // Chart type options
 // Must match CHART_TYPE_NAMES in lib/prompts.js
 export const CHART_TYPES = {
-  auto: '自动',
-  flowchart: '流程图',
-  mindmap: '思维导图',
-  orgchart: '组织架构图',
-  sequence: '时序图',
-  class: 'UML类图',
-  er: 'ER图',
-  gantt: '甘特图',
-  timeline: '时间线',
-  tree: '树形图',
-  network: '网络拓扑图',
-  architecture: '架构图',
-  dataflow: '数据流图',
-  state: '状态图',
-  swimlane: '泳道图',
-  concept: '概念图',
-  fishbone: '鱼骨图',
-  swot: 'SWOT分析图',
-  pyramid: '金字塔图',
-  funnel: '漏斗图',
-  venn: '韦恩图',
-  matrix: '矩阵图',
-  infographic: '信息图'
+  auto: 'Auto',
+  flowchart: 'Flowchart',
+  mindmap: 'Mind Map',
+  orgchart: 'Org Chart',
+  sequence: 'Sequence Diagram',
+  class: 'UML Class Diagram',
+  er: 'ER Diagram',
+  gantt: 'Gantt Chart',
+  timeline: 'Timeline',
+  tree: 'Tree Diagram',
+  network: 'Network Topology',
+  architecture: 'Architecture Diagram',
+  dataflow: 'Data Flow Diagram',
+  state: 'State Diagram',
+  swimlane: 'Swimlane Diagram',
+  concept: 'Concept Map',
+  fishbone: 'Fishbone Diagram',
+  swot: 'SWOT Analysis',
+  pyramid: 'Pyramid Diagram',
+  funnel: 'Funnel Diagram',
+  venn: 'Venn Diagram',
+  matrix: 'Matrix Diagram',
+  infographic: 'Infographic'
 };

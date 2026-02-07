@@ -17,13 +17,13 @@ export async function POST(request) {
       const envPassword = process.env.ACCESS_PASSWORD;
       if (!envPassword) {
         return NextResponse.json(
-          { error: '服务器未配置访问密码' },
+          { error: 'Access password not configured on server' },
           { status: 400 }
         );
       }
       if (accessPassword !== envPassword) {
         return NextResponse.json(
-          { error: '访问密码错误' },
+          { error: 'Incorrect access password' },
           { status: 401 }
         );
       }
@@ -36,7 +36,7 @@ export async function POST(request) {
       };
       if (!finalConfig.type || !finalConfig.apiKey) {
         return NextResponse.json(
-          { error: '服务器LLM配置不完整' },
+          { error: 'Server LLM configuration is incomplete' },
           { status: 500 }
         );
       }
@@ -113,4 +113,3 @@ export async function POST(request) {
     );
   }
 }
-

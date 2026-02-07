@@ -19,32 +19,32 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
   const fileInputRef = useRef(null);
   const dragCounterRef = useRef(0);
 
-  // 处理文件选择
+  // Handle file selection
   const handleFileSelect = async (file) => {
     if (!file) return;
 
-    // 重置状态
+    // Reset state
     setUploadStatus('uploading');
     setErrorMessage('');
 
     try {
-      // 验证文件
+      // Validate file
       const validation = validateImage(file);
       if (!validation.isValid) {
         throw new Error(validation.error);
       }
 
-      // 创建预览
+      // Create preview
       const previewUrl = await getImagePreviewUrl(file);
       setImagePreview(previewUrl);
       setSelectedFile(file);
 
-      // 处理图片对象
+      // Process image object
       const imageObject = await createImageObject(file);
 
       setUploadStatus('success');
 
-      // 回调父组件
+      // Callback to parent component
       if (onImageSelect) {
         onImageSelect({
           ...imageObject,
@@ -55,11 +55,11 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
     } catch (error) {
       setUploadStatus('error');
       setErrorMessage(error.message);
-      console.error('图片处理失败:', error);
+      console.error('Image processing failed:', error);
     }
   };
 
-  // 文件输入变化处理
+  // Handle file input change
   const handleFileInputChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -67,14 +67,14 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
     }
   };
 
-  // 点击上传按钮
+  // Handle upload button click
   const handleUploadClick = () => {
     if (!isGenerating && uploadStatus !== 'uploading') {
       fileInputRef.current?.click();
     }
   };
 
-  // 拖拽处理
+  // Handle drag events
   const handleDragEnter = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -110,7 +110,7 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
     }
   };
 
-  // 清除图片
+  // Clear image
   const handleClearImage = () => {
     setImagePreview(null);
     setSelectedFile(null);
@@ -126,10 +126,10 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
 
   return (
     <div className="flex-1 flex flex-col p-4">
-      {/* 图表类型选择器 */}
+      {/* Chart Type Selector */}
       <div className="w-full mb-4">
         {/* <label htmlFor="chart-type-image" className="block text-xs font-medium text-gray-700 mb-1">
-          图表类型
+          Chart Type
         </label> */}
         <select
           id="chart-type-image"
@@ -147,7 +147,7 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
       </div>
 
       {!selectedFile ? (
-        // 上传区域
+        // Upload area
         <div
           className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg transition-colors duration-200 ${
             isDragging
@@ -173,9 +173,9 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="text-sm text-gray-600 mb-1">上传图片进行识别</p>
+            <p className="text-sm text-gray-600 mb-1">Upload image for recognition</p>
             <p className="text-xs text-gray-400">
-              支持 JPG、PNG、WebP、GIF 格式，最大 5MB
+              Supports JPG, PNG, WebP, GIF formats, max 5MB
             </p>
           </div>
 
@@ -196,12 +196,12 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
             {uploadStatus === 'uploading' ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>处理中...</span>
+                <span>Processing...</span>
               </>
             ) : isGenerating ? (
               <>
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>生成中...</span>
+                <span>Generating...</span>
               </>
             ) : (
               <>
@@ -213,40 +213,40 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
                     d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                   />
                 </svg>
-                <span>选择图片</span>
+                <span>Select Image</span>
               </>
             )}
           </button>
 
           {isDragging && (
-            <p className="mt-3 text-sm text-blue-600">松开鼠标上传图片</p>
+            <p className="mt-3 text-sm text-blue-600">Release to upload image</p>
           )}
         </div>
       ) : (
-        // 图片预览区域
+        // Image preview area
         <div className="flex-1 flex flex-col">
           <div className="flex-1 flex justify-center relative bg-gray-50 rounded-lg overflow-hidden border border-gray-200">
             {imagePreview && (
               <img
                 src={imagePreview}
-                alt="预览"
+                alt="Preview"
                 className="w-full object-contain"
               />
             )}
 
-            {/* 删除按钮 */}
+            {/* Delete Button */}
             <button
               onClick={handleClearImage}
               disabled={isGenerating || uploadStatus === 'uploading'}
               className="absolute top-3 right-3 p-2 bg-white rounded-full shadow-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
-              title="删除图片"
+              title="Delete image"
             >
               <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            {/* 成功状态指示器 */}
+            {/* Success Status Indicator */}
             {uploadStatus === 'success' && (
               <div className="absolute top-3 left-3">
                 <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
@@ -257,17 +257,17 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
               </div>
             )}
 
-            {/* 状态指示器 */}
+            {/* Status Indicator */}
             {uploadStatus === 'uploading' && (
               <div className="absolute inset-0 flex items-center justify-center bg-white/75">
                 <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
-            {/* 图片信息 - 绝对定位在图片下方 */}
+            {/* Image Info */}
             {selectedFile && (
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-                {/* TODO: 文字居中显示 */}
+                {/* TODO: Center text display */}
                 <p className="text-xs font-medium text-white mb-1 truncate" title={selectedFile.name}>
                   {selectedFile.name}
                 </p>
@@ -275,14 +275,14 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
             )}
           </div>
 
-          {/* 错误消息 */}
+          {/* Error Message */}
           {errorMessage && (
             <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded">
               <p className="text-xs text-red-600">{errorMessage}</p>
             </div>
           )}
 
-          {/* 生成按钮 */}
+          {/* Generate Button */}
           {uploadStatus === 'success' && !isGenerating && (
             <button
               onClick={onImageGenerate}
@@ -291,11 +291,11 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
-              <span>开始生成</span>
+              <span>Start Generating</span>
             </button>
           )}
 
-          {/* 生成中状态 */}
+          {/* Generating Status */}
           {isGenerating && uploadStatus === 'success' && (
             <div className="mt-2 flex items-center justify-center text-sm text-blue-600">
               <div className="flex space-x-1 mr-2">
@@ -303,7 +303,7 @@ export default function ImageUpload({ onImageSelect, isGenerating, chartType, on
                 <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
                 <div className="w-1.5 h-1.5 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
-              <span>正在识别...</span>
+              <span>Recognizing...</span>
             </div>
           )}
         </div>

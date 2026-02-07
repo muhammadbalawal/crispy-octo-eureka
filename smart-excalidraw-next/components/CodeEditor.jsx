@@ -6,14 +6,14 @@ export default function CodeEditor({ code, onChange, onApply, onOptimize, onClea
   return (
     <div className="flex relative flex-col h-full bg-gray-50 border-t border-gray-200">
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-700">生成的代码</h3>
+        <h3 className="text-sm font-semibold text-gray-700">Generated Code</h3>
         <div className="flex space-x-2">
           <button
             onClick={onClear}
             disabled={isGenerating || isApplyingCode || isOptimizingCode}
             className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors duration-200 flex items-center gap-2"
           >
-            清除
+            Clear
             {isGenerating && (
               <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin"></div>
             )}
@@ -25,16 +25,16 @@ export default function CodeEditor({ code, onChange, onApply, onOptimize, onClea
             style={{
               background: isGenerating || isApplyingCode || isOptimizingCode ? '#d1d5db' : 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)'
             }}
-            title="优化图标布局和箭头连接"
+            title="Optimize icon layout and arrow connections"
           >
             {isOptimizingCode ? (
               <>
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>优化中...</span>
+                <span>Optimizing...</span>
               </>
             ) : (
               <>
-                <span>优化</span>
+                <span>Optimize</span>
                 {isGenerating && (
                   <div className="w-3 h-3 border border-white border-t-transparent rounded-full animate-spin"></div>
                 )}
@@ -49,11 +49,11 @@ export default function CodeEditor({ code, onChange, onApply, onOptimize, onClea
             {isApplyingCode ? (
               <>
                 <div className="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>应用中...</span>
+                <span>Applying...</span>
               </>
             ) : (
               <>
-                <span>应用</span>
+                <span>Apply</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -116,4 +116,3 @@ export default function CodeEditor({ code, onChange, onApply, onOptimize, onClea
     </div>
   );
 }
-

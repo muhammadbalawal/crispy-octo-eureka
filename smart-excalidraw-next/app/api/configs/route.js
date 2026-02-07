@@ -24,7 +24,7 @@ export async function POST(request) {
     return NextResponse.json(
       {
         success: false,
-        message: error.message || '连接测试失败'
+        message: error.message || 'Connection test failed'
       },
       { status: 500 }
     );

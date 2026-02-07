@@ -2,7 +2,7 @@
 
 export default function LoadingOverlay({
   isVisible,
-  message = "处理中...",
+  message = "Processing...",
   transparent = false,
   className = ""
 }) {

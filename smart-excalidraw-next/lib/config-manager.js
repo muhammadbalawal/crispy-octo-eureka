@@ -1,5 +1,5 @@
 /**
- * 配置管理器 - 处理多份大模型API配置的管理
+ * Configuration Manager - Manages multiple LLM API configurations
  */
 
 class ConfigManager {
@@ -13,14 +13,14 @@ class ConfigManager {
   }
 
   /**
-   * 生成唯一ID
+   * Generate unique ID
    */
   generateId() {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
   /**
-   * 确保配置已加载
+   * Ensure configs are loaded
    */
   ensureLoaded() {
     if (!this.isLoaded) {
@@ -29,7 +29,7 @@ class ConfigManager {
   }
 
   /**
-   * 获取活跃配置ID
+   * Get active config ID
    */
   getActiveConfigId() {
     this.ensureLoaded();
@@ -37,7 +37,7 @@ class ConfigManager {
   }
 
   /**
-   * 从localStorage加载配置
+   * Load configs from localStorage
    */
   loadConfigs() {
     // Check if we're in browser environment
@@ -51,7 +51,7 @@ class ConfigManager {
       this.activeConfigId = localStorage.getItem(this.ACTIVE_CONFIG_KEY);
       this.isLoaded = true;
 
-      // 如果没有活跃配置但有配置列表，设置第一个为活跃配置
+      // If no active config but config list exists, set first as active
       if (!this.activeConfigId && this.configs.length > 0) {
         this.activeConfigId = this.configs[0].id;
         this.saveActiveConfigId();
@@ -65,7 +65,7 @@ class ConfigManager {
   }
 
   /**
-   * 保存配置到localStorage
+   * Save configs to localStorage
    */
   saveConfigs() {
     // Check if we're in browser environment
@@ -81,7 +81,7 @@ class ConfigManager {
   }
 
   /**
-   * 保存活跃配置ID
+   * Save active config ID
    */
   saveActiveConfigId() {
     // Check if we're in browser environment
@@ -101,12 +101,12 @@ class ConfigManager {
   }
 
   /**
-   * 创建新配置
+   * Create new config
    */
   createConfig(configData) {
     const newConfig = {
       id: this.generateId(),
-      name: configData.name || '新配置',
+      name: configData.name || 'New Config',
       type: configData.type || 'openai',
       baseUrl: configData.baseUrl || '',
       apiKey: configData.apiKey || '',
@@ -120,7 +120,7 @@ class ConfigManager {
 
     this.configs.push(newConfig);
 
-    // 如果这是第一个配置，设置为活跃配置
+    // If this is the first config, set as active
     if (this.configs.length === 1) {
       this.setActiveConfig(newConfig.id);
     }
@@ -130,18 +130,18 @@ class ConfigManager {
   }
 
   /**
-   * 更新配置
+   * Update config
    */
   updateConfig(id, updateData) {
     const configIndex = this.configs.findIndex(config => config.id === id);
     if (configIndex === -1) {
-      throw new Error('配置不存在');
+      throw new Error('Config does not exist');
     }
 
     this.configs[configIndex] = {
       ...this.configs[configIndex],
       ...updateData,
-      id, // 确保ID不被修改
+      id, // Ensure ID is not modified
       updatedAt: new Date().toISOString()
     };
 
@@ -150,18 +150,18 @@ class ConfigManager {
   }
 
   /**
-   * 删除配置
+   * Delete config
    */
   deleteConfig(id) {
     const configIndex = this.configs.findIndex(config => config.id === id);
     if (configIndex === -1) {
-      throw new Error('配置不存在');
+      throw new Error('Config does not exist');
     }
 
-    // 如果删除的是活跃配置，需要重新设置活跃配置
+    // If deleting the active config, need to reset active config
     if (this.activeConfigId === id) {
       this.activeConfigId = null;
-      // 设置剩余配置中的第一个为活跃配置
+      // Set first remaining config as active
       if (this.configs.length > 1) {
         const remainingConfigs = this.configs.filter(config => config.id !== id);
         this.activeConfigId = remainingConfigs[0].id;
@@ -176,7 +176,7 @@ class ConfigManager {
   }
 
   /**
-   * 获取所有配置
+   * Get all configs
    */
   getAllConfigs() {
     this.ensureLoaded();
@@ -184,7 +184,7 @@ class ConfigManager {
   }
 
   /**
-   * 根据ID获取配置
+   * Get config by ID
    */
   getConfig(id) {
     this.ensureLoaded();
@@ -192,7 +192,7 @@ class ConfigManager {
   }
 
   /**
-   * 获取当前活跃配置
+   * Get current active config
    */
   getActiveConfig() {
     this.ensureLoaded();
@@ -201,12 +201,12 @@ class ConfigManager {
   }
 
   /**
-   * 设置活跃配置
+   * Set active config
    */
   setActiveConfig(id) {
     const config = this.getConfig(id);
     if (!config) {
-      throw new Error('配置不存在');
+      throw new Error('Config does not exist');
     }
 
     this.activeConfigId = id;
@@ -215,18 +215,18 @@ class ConfigManager {
   }
 
   /**
-   * 克隆配置
+   * Clone config
    */
   cloneConfig(id, newName) {
     this.ensureLoaded();
     const originalConfig = this.getConfig(id);
     if (!originalConfig) {
-      throw new Error('原配置不存在');
+      throw new Error('Original config does not exist');
     }
 
     const clonedConfig = {
       ...originalConfig,
-      name: newName || `${originalConfig.name} (副本)`,
+      name: newName || `${originalConfig.name} (Copy)`,
       isActive: false
     };
 
@@ -238,35 +238,35 @@ class ConfigManager {
   }
 
   /**
-   * 验证配置
+   * Validate config
    */
   validateConfig(config) {
     const errors = [];
 
     if (!config.name || config.name.trim() === '') {
-      errors.push('配置名称不能为空');
+      errors.push('Config name cannot be empty');
     }
 
     if (!config.type || !['openai', 'anthropic'].includes(config.type)) {
-      errors.push('配置类型必须是 openai 或 anthropic');
+      errors.push('Config type must be openai or anthropic');
     }
 
     if (!config.baseUrl || config.baseUrl.trim() === '') {
-      errors.push('API地址不能为空');
+      errors.push('API URL cannot be empty');
     } else {
       try {
         new URL(config.baseUrl);
       } catch {
-        errors.push('API地址格式不正确');
+        errors.push('API URL format is incorrect');
       }
     }
 
     if (!config.apiKey || config.apiKey.trim() === '') {
-      errors.push('API密钥不能为空');
+      errors.push('API key cannot be empty');
     }
 
     if (!config.model || config.model.trim() === '') {
-      errors.push('模型名称不能为空');
+      errors.push('Model name cannot be empty');
     }
 
     return {
@@ -276,36 +276,36 @@ class ConfigManager {
   }
 
   /**
-   * 测试配置连接
+   * Test config connection
    */
   async testConnection(config) {
     const validation = this.validateConfig(config);
     if (!validation.isValid) {
-      throw new Error('配置无效: ' + validation.errors.join(', '));
+      throw new Error('Invalid config: ' + validation.errors.join(', '));
     }
 
     try {
-      // 这里可以添加实际的连接测试逻辑
-      // 暂时返回成功状态
-      return { success: true, message: '连接测试成功' };
+      // Actual connection test logic can be added here
+      // Temporarily return success status
+      return { success: true, message: 'Connection test successful' };
     } catch (error) {
       return { success: false, message: error.message };
     }
   }
 
   /**
-   * 导入配置
+   * Import configs
    */
   importConfigs(configsData) {
     try {
       const importedConfigs = JSON.parse(configsData);
       if (!Array.isArray(importedConfigs)) {
-        throw new Error('导入数据格式错误');
+        throw new Error('Invalid import data format');
       }
 
       let importCount = 0;
       for (const configData of importedConfigs) {
-        // 验证配置格式
+        // Validate config format
         const validation = this.validateConfig(configData);
         if (validation.isValid) {
           this.createConfig({
@@ -323,14 +323,14 @@ class ConfigManager {
   }
 
   /**
-   * 导出配置
+   * Export configs
    */
   exportConfigs() {
     return JSON.stringify(this.configs, null, 2);
   }
 
   /**
-   * 搜索配置
+   * Search configs
    */
   searchConfigs(query) {
     this.ensureLoaded();
@@ -343,7 +343,7 @@ class ConfigManager {
   }
 
   /**
-   * 获取配置统计信息
+   * Get config statistics
    */
   getStats() {
     this.ensureLoaded();
@@ -366,6 +366,6 @@ class ConfigManager {
   }
 }
 
-// 导出单例实例
+// Export singleton instance
 export const configManager = new ConfigManager();
 export default ConfigManager;

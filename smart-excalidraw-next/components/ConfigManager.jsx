@@ -40,7 +40,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       setConfigs(allConfigs);
       setActiveConfigId(activeId);
     } catch (err) {
-      setError('加载配置失败: ' + err.message);
+      setError('Failed to load configs: ' + err.message);
     }
   };
 
@@ -64,8 +64,8 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
   const handleDelete = async (configId) => {
     setConfirmDialog({
       isOpen: true,
-      title: '确认删除',
-      message: '确定要删除这个配置吗？此操作不可恢复。',
+      title: 'Confirm Delete',
+      message: 'Are you sure you want to delete this config? This action cannot be undone.',
       onConfirm: async () => {
         try {
           await configManager.deleteConfig(configId);
@@ -73,26 +73,26 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
           setError('');
           setNotification({
             isOpen: true,
-            title: '删除成功',
-            message: '配置已成功删除',
+            title: 'Deleted Successfully',
+            message: 'Config has been deleted successfully',
             type: 'success'
           });
         } catch (err) {
-          setError('删除配置失败: ' + err.message);
+          setError('Failed to delete config: ' + err.message);
         }
       }
     });
   };
 
   const handleClone = (config) => {
-    const newName = `${config.name} (副本)`;
+    const newName = `${config.name} (Copy)`;
 
     try {
       configManager.cloneConfig(config.id, newName);
       loadConfigs();
       setError('');
     } catch (err) {
-      setError('克隆配置失败: ' + err.message);
+      setError('Failed to clone config: ' + err.message);
     }
   };
 
@@ -103,7 +103,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       onConfigSelect?.(configManager.getActiveConfig());
       setError('');
     } catch (err) {
-      setError('切换配置失败: ' + err.message);
+      setError('Failed to switch config: ' + err.message);
     }
   };
 
@@ -116,14 +116,14 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       if (result.success) {
         setNotification({
           isOpen: true,
-          title: '连接测试成功',
+          title: 'Connection Test Successful',
           message: result.message,
           type: 'success'
         });
       } else {
         setNotification({
           isOpen: true,
-          title: '连接测试失败',
+          title: 'Connection Test Failed',
           message: result.message,
           type: 'error'
         });
@@ -131,7 +131,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
     } catch (err) {
       setNotification({
         isOpen: true,
-        title: '连接测试失败',
+        title: 'Connection Test Failed',
         message: err.message,
         type: 'error'
       });
@@ -159,7 +159,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       loadConfigs();
       setError('');
     } catch (err) {
-      setError('保存配置失败: ' + err.message);
+      setError('Failed to save config: ' + err.message);
     }
   };
 
@@ -174,7 +174,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError('导出配置失败: ' + err.message);
+      setError('Failed to export configs: ' + err.message);
     }
   };
 
@@ -192,16 +192,16 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
         if (result.success) {
           setNotification({
             isOpen: true,
-            title: '导入成功',
-            message: `成功导入 ${result.count} 个配置`,
+            title: 'Import Successful',
+            message: `Successfully imported ${result.count} configs`,
             type: 'success'
           });
           loadConfigs();
         } else {
-          setError('导入配置失败: ' + result.message);
+          setError('Failed to import configs: ' + result.message);
         }
       } catch (err) {
-        setError('导入配置失败: ' + err.message);
+        setError('Failed to import configs: ' + err.message);
       }
     };
     input.click();
@@ -237,7 +237,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
       <div className="relative bg-white rounded border border-gray-300 w-full max-w-4xl mx-4 max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">配置管理</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Config Management</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-gray-600 transition-colors duration-200"
@@ -257,7 +257,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
           )}
 
           <div className="mb-4 px-4 py-3 bg-blue-50 border border-blue-200 rounded">
-            <p className="text-sm text-blue-800">提示：如果启用了访问密码，将优先使用服务器端配置，此处配置将被忽略</p>
+            <p className="text-sm text-blue-800">Note: If access password is enabled, server-side configuration will be used and these settings will be ignored</p>
           </div>
 
           {/* Actions Bar */}
@@ -266,19 +266,19 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
               onClick={handleCreateNew}
               className="px-4 py-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors duration-200"
             >
-              新建配置
+              New Config
             </button>
             <button
               onClick={handleExport}
               className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors duration-200"
             >
-              导出配置
+              Export Configs
             </button>
             <button
               onClick={handleImport}
               className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors duration-200"
             >
-              导入配置
+              Import Configs
             </button>
           </div>
 
@@ -288,7 +288,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索配置..."
+              placeholder="Search configs..."
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -297,7 +297,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
           <div className="space-y-3">
             {filteredConfigs.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {searchQuery ? '没有找到匹配的配置' : '暂无配置，点击"新建配置"创建第一个配置'}
+                {searchQuery ? 'No matching configs found' : 'No configs yet. Click "New Config" to create your first one'}
               </div>
             ) : (
               filteredConfigs.map((config) => (
@@ -314,7 +314,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="font-medium text-gray-900">{config.name}</h3>
                         {config.id === activeConfigId && (
-                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">当前使用</span>
+                          <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded">Active</span>
                         )}
                         <span className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded">
                           {config.type}
@@ -325,8 +325,8 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
                       )}
                       <div className="text-xs text-gray-500 space-y-1">
                         <div>URL: {config.baseUrl}</div>
-                        <div>模型: {config.model}</div>
-                        <div>创建时间: {new Date(config.createdAt).toLocaleString()}</div>
+                        <div>Model: {config.model}</div>
+                        <div>Created: {new Date(config.createdAt).toLocaleString()}</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 ml-4">
@@ -335,7 +335,7 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
                           onClick={() => handleSetActive(config.id)}
                           className="px-3 py-1 text-xs bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors duration-200"
                         >
-                          设为当前
+                          Set Active
                         </button>
                       )}
                       <button
@@ -343,26 +343,26 @@ export default function ConfigManager({ isOpen, onClose, onConfigSelect }) {
                         disabled={isLoading}
                         className="px-3 py-1 text-xs bg-green-500 text-white rounded hover:bg-green-600 transition-colors duration-200 disabled:bg-gray-400"
                       >
-                        测试
+                        Test
                       </button>
                       <button
                         onClick={() => handleEdit(config)}
                         className="px-3 py-1 text-xs bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors duration-200"
                       >
-                        编辑
+                        Edit
                       </button>
                       <button
                         onClick={() => handleClone(config)}
                         className="px-3 py-1 text-xs bg-purple-500 text-white rounded hover:bg-purple-600 transition-colors duration-200"
                       >
-                        克隆
+                        Clone
                       </button>
                       {configs.length > 1 && (
                         <button
                           onClick={() => handleDelete(config.id)}
                           className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
                         >
-                          删除
+                          Delete
                         </button>
                       )}
                     </div>
@@ -420,7 +420,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
   const handleLoadModels = async () => {
     if (!formData.type || !formData.baseUrl || !formData.apiKey) {
-      setError('请先填写提供商类型、基础 URL 和 API 密钥');
+      setError('Please fill in provider type, base URL, and API key first');
       return;
     }
 
@@ -438,7 +438,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || '加载模型失败');
+        throw new Error(data.error || 'Failed to load models');
       }
 
       setModels(data.models);
@@ -452,7 +452,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
   const handleSave = () => {
     if (!formData.name || !formData.type || !formData.baseUrl || !formData.apiKey || !formData.model) {
-      setError('请填写所有必填字段');
+      setError('Please fill in all required fields');
       return;
     }
 
@@ -468,7 +468,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
       <div className="relative bg-white rounded border border-gray-300 w-full max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">
-            {isCreating ? '新建配置' : '编辑配置'}
+            {isCreating ? 'New Config' : 'Edit Config'}
           </h2>
           <button
             onClick={onCancel}
@@ -489,25 +489,25 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              配置名称 <span className="text-red-500">*</span>
+              Config Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="例如：我的 OpenAI"
+              placeholder="e.g., My OpenAI"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              描述
+              Description
             </label>
             <textarea
               value={formData.description || ''}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="配置描述（可选）"
+              placeholder="Config description (optional)"
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
@@ -515,7 +515,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              提供商类型 <span className="text-red-500">*</span>
+              Provider Type <span className="text-red-500">*</span>
             </label>
             <select
               value={formData.type}
@@ -529,7 +529,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              基础 URL <span className="text-red-500">*</span>
+              Base URL <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -542,7 +542,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              API 密钥 <span className="text-red-500">*</span>
+              API Key <span className="text-red-500">*</span>
             </label>
             <input
               type="password"
@@ -559,13 +559,13 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
               disabled={loading}
               className="w-full px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded hover:bg-gray-50 disabled:bg-gray-50 disabled:text-gray-400 transition-colors duration-200 font-medium"
             >
-              {loading ? '加载模型中...' : '加载可用模型'}
+              {loading ? 'Loading models...' : 'Load Available Models'}
             </button>
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              模型 <span className="text-red-500">*</span>
+              Model <span className="text-red-500">*</span>
             </label>
 
             {models.length > 0 && (
@@ -582,7 +582,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
                     }}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">从列表选择</span>
+                  <span className="text-sm text-gray-700">Select from list</span>
                 </label>
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -594,7 +594,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
                     }}
                     className="mr-2"
                   />
-                  <span className="text-sm text-gray-700">手动输入</span>
+                  <span className="text-sm text-gray-700">Manual input</span>
                 </label>
               </div>
             )}
@@ -618,7 +618,7 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
                 type="text"
                 value={formData.model}
                 onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                placeholder="例如：gpt-4、claude-3-opus-20240229"
+                placeholder="e.g., gpt-4, claude-3-opus-20240229"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900"
               />
             )}
@@ -630,13 +630,13 @@ function ConfigEditor({ config, isCreating, onSave, onCancel }) {
             onClick={onCancel}
             className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors duration-200"
           >
-            取消
+            Cancel
           </button>
           <button
             onClick={handleSave}
             className="px-4 py-2 text-white bg-gray-900 rounded hover:bg-gray-800 transition-colors duration-200"
           >
-            {isCreating ? '创建' : '保存'}
+            {isCreating ? 'Create' : 'Save'}
           </button>
         </div>
       </div>

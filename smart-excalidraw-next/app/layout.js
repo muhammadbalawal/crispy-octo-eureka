@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Smart Excalidraw",
-  description: "AI 驱动的图表生成",
+  description: "AI-Powered Diagram Generation",
 };
 
 export default function RootLayout({ children }) {

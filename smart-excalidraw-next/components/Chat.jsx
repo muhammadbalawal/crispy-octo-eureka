@@ -72,7 +72,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
     const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
 
     if (!validExtensions.includes(fileExtension)) {
-      setFileError('请选择 .md 或 .txt 文件');
+      setFileError('Please select a .md or .txt file');
       setFileStatus('error');
       setCanGenerate(false);
       return;
@@ -81,7 +81,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
     // Validate file size (max 1MB)
     const maxSize = 1 * 1024 * 1024; // 1MB in bytes
     if (file.size > maxSize) {
-      setFileError('文件大小不能超过 1MB');
+      setFileError('File size cannot exceed 1MB');
       setFileStatus('error');
       setCanGenerate(false);
       return;
@@ -104,14 +104,14 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
         setCanGenerate(true); // Enable generation button
         // Don't auto-submit the file content - wait for user to click generate button
       } else {
-        setFileError('文件内容为空');
+        setFileError('File content is empty');
         setFileStatus('error');
         setCanGenerate(false);
       }
     };
 
     reader.onerror = () => {
-      setFileError('文件读取失败');
+      setFileError('Failed to read file');
       setFileStatus('error');
       setCanGenerate(false);
     };
@@ -136,8 +136,8 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
 
   const handleImageSelect = (imageData) => {
     setSelectedImage(imageData);
-    // 图片选择完成后，不立即发送处理请求
-    // 用户需要点击"开始生成"按钮才会开始生成
+    // After image selection, don't immediately send processing request
+    // User needs to click "Start Generating" button to begin generation
     if (imageData) {
       setCanGenerate(true); // Enable generation button for image
     } else {
@@ -150,10 +150,10 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
       track('image_submit');
       // Mark source as image to avoid syncing into text input
       lastSubmitSourceRef.current = 'image';
-      // 生成针对图片的提示词
+      // Generate image-specific prompt
       const imagePrompt = generateImagePrompt(chartType);
 
-      // 创建包含图片数据的消息对象
+      // Create message object containing image data
       const messageData = {
         text: imagePrompt,
         image: selectedImage,
@@ -170,7 +170,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
     <div className="flex flex-col h-full bg-white">
       {/* Header */}
       {/* <div className="px-4 py-3 bg-white border-b border-gray-200">
-        <h3 className="text-sm font-semibold text-gray-700">输入</h3>
+        <h3 className="text-sm font-semibold text-gray-700">Input</h3>
       </div> */}
 
       {/* Tab Navigation */}
@@ -186,7 +186,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          文本输入
+          Text Input
         </button>
         <button
           onClick={() => {
@@ -199,7 +199,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          文件上传
+          File Upload
         </button>
         <button
           onClick={() => {
@@ -212,7 +212,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
           }`}
         >
-          图片上传
+          Image Upload
         </button>
       </div>
 
@@ -225,7 +225,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
               {/* Chart Type Selector */}
               <div className="mb-3">
                 {/* <label htmlFor="chart-type-text" className="block text-xs font-medium text-gray-700 mb-1">
-                  图表类型
+                  Chart Type
                 </label> */}
                 <select
                   id="chart-type-text"
@@ -247,7 +247,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="描述您想要创建的图表..."
+                  placeholder="Describe the chart you want to create..."
                   className="w-full h-full pl-3 pr-12 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-gray-900 resize-none text-sm scrollbar-hide"
                   style={{
                     scrollbarWidth: 'none',
@@ -259,7 +259,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
                   type="submit"
                   disabled={!input.trim() || isGenerating}
                   className="absolute right-2 bottom-2 p-2 bg-gray-900 text-white rounded hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors duration-200"
-                  title={isGenerating ? "生成中..." : "发送"}
+                  title={isGenerating ? "Generating..." : "Send"}
                 >
                   {isGenerating ? (
                     <div className="flex items-center justify-center">
@@ -276,7 +276,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
             {/* Unified Loading Overlay */}
             <LoadingOverlay
               isVisible={isGenerating}
-              message="正在生成图表..."
+              message="Generating chart..."
             />
           </div>
         )}
@@ -287,7 +287,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
             {/* Chart Type Selector */}
             <div className="w-full max-w-md mb-6">
               {/* <label htmlFor="chart-type-file" className="block text-xs font-medium text-gray-700 mb-1">
-                图表类型
+                Chart Type
               </label> */}
               <select
                 id="chart-type-file"
@@ -304,8 +304,8 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
               </select>
             </div>
             <div className="text-center mb-6">
-              <p className="text-sm text-gray-600 mb-2">上传 Markdown 或文本文件</p>
-              <p className="text-xs text-gray-400">支持 .md 和 .txt 格式，最大 1MB</p>
+              <p className="text-sm text-gray-600 mb-2">Upload Markdown or text file</p>
+              <p className="text-xs text-gray-400">Supports .md and .txt formats, max 1MB</p>
             </div>
 
             <input
@@ -330,8 +330,8 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
                 </svg>
               )}
               <span>
-                {fileStatus === 'parsing' ? '解析中...' :
-                 isGenerating ? '生成中...' : '选择文件'}
+                {fileStatus === 'parsing' ? 'Parsing...' :
+                 isGenerating ? 'Generating...' : 'Select File'}
               </span>
             </button>
 
@@ -364,16 +364,16 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{selectedFile.name}</p>
                       {fileStatus === 'success' && !isGenerating && (
-                        <p className="text-xs text-green-600 mt-1">文件已上传，可以开始生成</p>
+                        <p className="text-xs text-green-600 mt-1">File uploaded, ready to generate</p>
                       )}
                       {fileStatus === 'success' && isGenerating && (
-                        <p className="text-xs text-blue-600 mt-1">正在生成图表...</p>
+                        <p className="text-xs text-blue-600 mt-1">Generating chart...</p>
                       )}
                       {fileStatus === 'error' && (
                         <p className="text-xs text-red-600 mt-1">{fileError}</p>
                       )}
                       {fileStatus === 'parsing' && (
-                        <p className="text-xs text-blue-600 mt-1">正在解析文件...</p>
+                        <p className="text-xs text-blue-600 mt-1">Parsing file...</p>
                       )}
                     </div>
                   </div>
@@ -390,7 +390,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                       </svg>
-                      <span>开始生成</span>
+                      <span>Start Generating</span>
                     </button>
                   </div>
                 )}
@@ -399,7 +399,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
             {/* Unified Loading Overlay */}
             <LoadingOverlay
               isVisible={isGenerating || fileStatus === 'parsing'}
-              message={fileStatus === 'parsing' ? '正在解析文件...' : '正在生成图表...'}
+              message={fileStatus === 'parsing' ? 'Parsing file...' : 'Generating chart...'}
             />
           </div>
         )}
@@ -417,7 +417,7 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
             {/* Unified Loading Overlay for image upload */}
             <LoadingOverlay
               isVisible={isGenerating}
-              message="正在识别图片内容并生成图表..."
+              message="Recognizing image content and generating chart..."
             />
           </div>
         )}
@@ -425,4 +425,3 @@ export default function Chat({ onSendMessage, isGenerating, initialInput = '', i
     </div>
   );
 }
-

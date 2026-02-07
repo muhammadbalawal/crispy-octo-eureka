@@ -1,4 +1,4 @@
-// 统一的加载动画组件
+// Unified loading spinner component
 
 export default function Spinner({ size = 'md', color = 'white' }) {
   const sizeClasses = {
