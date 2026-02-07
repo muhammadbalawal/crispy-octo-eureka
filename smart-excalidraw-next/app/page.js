@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Chat from '@/components/Chat';
 import CodeEditor from '@/components/CodeEditor';
@@ -35,6 +35,11 @@ export default function Home() {
   const [currentInput, setCurrentInput] = useState('');
   const [currentChartType, setCurrentChartType] = useState('auto');
   const [usePassword, setUsePassword] = useState(false);
+  const [presentationMode, setPresentationMode] = useState(false);
+  const [isPresentationRunning, setIsPresentationRunning] = useState(false);
+  const [presentationStep, setPresentationStep] = useState(0);
+  const [presentationTotalSteps, setPresentationTotalSteps] = useState(0);
+  const stopPresentationRef = useRef(false);
   const [notification, setNotification] = useState({
     isOpen: false,
     title: '',
@@ -163,8 +168,202 @@ export default function Home() {
     return result;
   };
 
+  // Helper: stream an SSE response and return accumulated text
+  const streamSSEResponse = async (response) => {
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+    let accumulated = '';
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+
+      for (const line of lines) {
+        if (line.trim() === '' || line.trim() === 'data: [DONE]') continue;
+        if (line.startsWith('data: ')) {
+          try {
+            const data = JSON.parse(line.slice(6));
+            if (data.content) {
+              accumulated += data.content;
+            } else if (data.error) {
+              throw new Error(data.error);
+            }
+          } catch (e) {
+            if (e.message && !e.message.includes('Unexpected')) {
+              throw e;
+            }
+          }
+        }
+      }
+    }
+    return accumulated;
+  };
+
+  // Handle presentation mode: plan-then-draw iterative generation
+  const handlePresentationGenerate = async (userMessage, chartType = 'auto') => {
+    const usePassword = typeof window !== 'undefined' && localStorage.getItem('smart-excalidraw-use-password') === 'true';
+    const accessPassword = typeof window !== 'undefined' ? localStorage.getItem('smart-excalidraw-access-password') : '';
+
+    if (!usePassword && !isConfigValid(config)) {
+      setNotification({
+        isOpen: true,
+        title: 'Config Reminder',
+        message: 'Please configure your LLM provider or enable access password first',
+        type: 'warning'
+      });
+      setIsConfigManagerOpen(true);
+      return;
+    }
+
+    setCurrentInput(userMessage);
+    setCurrentChartType(chartType);
+    setIsGenerating(true);
+    setIsPresentationRunning(true);
+    stopPresentationRef.current = false;
+    setApiError(null);
+    setJsonError(null);
+    setPresentationStep(0);
+    setPresentationTotalSteps(0);
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (usePassword && accessPassword) {
+      headers['x-access-password'] = accessPassword;
+    }
+
+    try {
+      // Step 0: Get the drawing plan
+      const planResponse = await fetch('/api/generate', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          config: usePassword ? null : config,
+          userInput: userMessage,
+          chartType,
+          presentationMode: true,
+        }),
+      });
+
+      if (!planResponse.ok) {
+        let errorMessage = 'Failed to generate plan';
+        try {
+          const errorData = await planResponse.json();
+          if (errorData.error) errorMessage = errorData.error;
+        } catch (e) { /* ignore */ }
+        throw new Error(errorMessage);
+      }
+
+      const planText = await streamSSEResponse(planResponse);
+      setGeneratedCode(`// Drawing Plan:\n// ${planText.replace(/\n/g, '\n// ')}\n`);
+
+      if (stopPresentationRef.current) return;
+
+      // Parse step count from numbered lines
+      const stepLines = planText.split('\n').filter(line => /^\s*\d+[\.\)]\s/.test(line));
+      const totalSteps = stepLines.length || 1;
+      setPresentationTotalSteps(totalSteps);
+
+      let accumulatedElements = [];
+
+      // Steps 1..N: Generate elements for each step
+      for (let step = 1; step <= totalSteps; step++) {
+        if (stopPresentationRef.current) break;
+
+        setPresentationStep(step);
+
+        const stepResponse = await fetch('/api/generate', {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            config: usePassword ? null : config,
+            userInput: userMessage,
+            chartType,
+            presentationMode: true,
+            plan: planText,
+            existingElements: accumulatedElements,
+            stepNumber: step,
+            totalSteps,
+          }),
+        });
+
+        if (!stepResponse.ok) {
+          let errorMessage = `Failed to generate step ${step}`;
+          try {
+            const errorData = await stepResponse.json();
+            if (errorData.error) errorMessage = errorData.error;
+          } catch (e) { /* ignore */ }
+          throw new Error(errorMessage);
+        }
+
+        const rawStepCode = await streamSSEResponse(stepResponse);
+
+        // Post-process and parse the step elements
+        const processedStepCode = postProcessExcalidrawCode(rawStepCode);
+        const arrayMatch = processedStepCode.trim().match(/\[[\s\S]*\]/);
+        if (arrayMatch) {
+          const { safeParseJsonWithRepair } = await import('@/lib/json-repair');
+          const result = safeParseJsonWithRepair(arrayMatch[0]);
+          if (result.ok && Array.isArray(result.value)) {
+            accumulatedElements = [...accumulatedElements, ...result.value];
+            setElements(accumulatedElements);
+            // Update code editor to show accumulated elements
+            const optimizedCode = optimizeExcalidrawCode(JSON.stringify(accumulatedElements, null, 2));
+            setGeneratedCode(optimizedCode);
+          }
+        }
+
+        if (stopPresentationRef.current) break;
+
+        // Wait for animation between steps (except the last one)
+        if (step < totalSteps) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      }
+
+      // Save to history
+      if (userMessage && accumulatedElements.length > 0) {
+        const finalCode = JSON.stringify(accumulatedElements, null, 2);
+        const optimizedCode = optimizeExcalidrawCode(finalCode);
+        setGeneratedCode(optimizedCode);
+        tryParseAndApply(optimizedCode);
+
+        const userInputText = typeof userMessage === 'object' ? (userMessage.text || '') : userMessage;
+        historyManager.addHistory({
+          chartType,
+          userInput: userInputText,
+          generatedCode: optimizedCode,
+          config: {
+            name: config?.name || config?.type,
+            model: config?.model
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Presentation generation error:', error);
+      if (error.message === 'Failed to fetch' || error.name === 'TypeError') {
+        setApiError('Network connection failed, please check your connection');
+      } else {
+        setApiError(error.message);
+      }
+    } finally {
+      setIsGenerating(false);
+      setIsPresentationRunning(false);
+      setPresentationStep(0);
+      setPresentationTotalSteps(0);
+    }
+  };
+
   // Handle sending a message (single-turn)
   const handleSendMessage = async (userMessage, chartType = 'auto', sourceType = 'text') => {
+    // Route to presentation mode if toggled on
+    if (presentationMode) {
+      return handlePresentationGenerate(userMessage, chartType);
+    }
+
     const usePassword = typeof window !== 'undefined' && localStorage.getItem('smart-excalidraw-use-password') === 'true';
     const accessPassword = typeof window !== 'undefined' ? localStorage.getItem('smart-excalidraw-access-password') : '';
 
@@ -437,6 +636,34 @@ export default function Home() {
           <p className="text-xs text-gray-500">AI-Powered Diagram Generation</p>
         </div>
         <div className="flex items-center space-x-3">
+          {/* Presentation mode toggle + status */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setPresentationMode(!presentationMode)}
+              disabled={isGenerating}
+              className={`px-3 py-1.5 text-xs font-medium rounded border transition-colors duration-200 ${
+                presentationMode
+                  ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700'
+                  : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+              } ${isGenerating ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              Present
+            </button>
+            {isPresentationRunning && (
+              <>
+                <span className="text-xs text-indigo-600 font-medium">
+                  Step {presentationStep}/{presentationTotalSteps}
+                </span>
+                <button
+                  onClick={() => { stopPresentationRef.current = true; }}
+                  className="px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-300 rounded hover:bg-red-100 transition-colors duration-200"
+                >
+                  Stop
+                </button>
+              </>
+            )}
+          </div>
+
           {(usePassword || (config && isConfigValid(config))) && (
             <div className="flex items-center space-x-2 px-3 py-1.5 bg-green-50 rounded border border-green-300">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -530,7 +757,7 @@ export default function Home() {
 
         {/* Right Panel - Excalidraw Canvas */}
         <div style={{ width: `${100 - leftPanelWidth}%` }} className="bg-gray-50">
-          <ExcalidrawCanvas elements={elements} />
+          <ExcalidrawCanvas elements={elements} presentationMode={isPresentationRunning} />
         </div>
       </div>
 

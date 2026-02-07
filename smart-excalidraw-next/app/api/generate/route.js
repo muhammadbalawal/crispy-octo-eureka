@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { callLLM } from '@/lib/llm-client';
-import { SYSTEM_PROMPT, USER_PROMPT_TEMPLATE } from '@/lib/prompts';
+import { SYSTEM_PROMPT, USER_PROMPT_TEMPLATE, PRESENTATION_PLAN_PROMPT, PRESENTATION_SYSTEM_PROMPT, PRESENTATION_STEP_PROMPT } from '@/lib/prompts';
 
 /**
  * POST /api/generate
@@ -8,7 +8,7 @@ import { SYSTEM_PROMPT, USER_PROMPT_TEMPLATE } from '@/lib/prompts';
  */
 export async function POST(request) {
   try {
-    const { config, userInput, chartType } = await request.json();
+    const { config, userInput, chartType, presentationMode, plan, existingElements, stepNumber, totalSteps } = await request.json();
     const accessPassword = request.headers.get('x-access-password');
 
     // Check if using server-side config with access password
@@ -48,32 +48,51 @@ export async function POST(request) {
     }
 
     // Build messages array
-    let userMessage;
+    let fullMessages;
 
-    // Handle different input types
-    if (typeof userInput === 'object' && userInput.image) {
-      // Image input with text and image data
-      const { text, image } = userInput;
-      userMessage = {
-        role: 'user',
-        content: USER_PROMPT_TEMPLATE(text, chartType),
-        image: {
-          data: image.data,
-          mimeType: image.mimeType
-        }
-      };
+    if (presentationMode) {
+      if (!plan) {
+        // Step 0: Generate the drawing plan
+        fullMessages = [
+          { role: 'system', content: 'You are a diagram planning assistant. Create concise, actionable drawing plans.' },
+          { role: 'user', content: PRESENTATION_PLAN_PROMPT(userInput, chartType) }
+        ];
+      } else {
+        // Step 1-N: Generate elements for a specific step
+        fullMessages = [
+          { role: 'system', content: PRESENTATION_SYSTEM_PROMPT },
+          { role: 'user', content: PRESENTATION_STEP_PROMPT(plan, existingElements, stepNumber, totalSteps, userInput, chartType) }
+        ];
+      }
     } else {
-      // Regular text input
-      userMessage = {
-        role: 'user',
-        content: USER_PROMPT_TEMPLATE(userInput, chartType)
-      };
-    }
+      // Standard single-shot generation
+      let userMessage;
 
-    const fullMessages = [
-      { role: 'system', content: SYSTEM_PROMPT },
-      userMessage
-    ];
+      // Handle different input types
+      if (typeof userInput === 'object' && userInput.image) {
+        // Image input with text and image data
+        const { text, image } = userInput;
+        userMessage = {
+          role: 'user',
+          content: USER_PROMPT_TEMPLATE(text, chartType),
+          image: {
+            data: image.data,
+            mimeType: image.mimeType
+          }
+        };
+      } else {
+        // Regular text input
+        userMessage = {
+          role: 'user',
+          content: USER_PROMPT_TEMPLATE(userInput, chartType)
+        };
+      }
+
+      fullMessages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        userMessage
+      ];
+    }
 
     // Create a readable stream for SSE
     const encoder = new TextEncoder();

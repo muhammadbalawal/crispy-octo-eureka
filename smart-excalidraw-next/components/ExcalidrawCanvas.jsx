@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import '@excalidraw/excalidraw/index.css';
 
 // Dynamically import Excalidraw with no SSR
@@ -16,9 +16,10 @@ const getConvertFunction = async () => {
   return excalidrawModule.convertToExcalidrawElements;
 };
 
-export default function ExcalidrawCanvas({ elements }) {
+export default function ExcalidrawCanvas({ elements, presentationMode = false }) {
   const [convertToExcalidrawElements, setConvertFunction] = useState(null);
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const prevElementCountRef = useRef(0);
 
   // Load convert function on mount
   useEffect(() => {
@@ -41,10 +42,33 @@ export default function ExcalidrawCanvas({ elements }) {
     }
   }, [elements, convertToExcalidrawElements]);
 
-  // Auto zoom to fit content when API is ready and elements change
+  // Presentation mode: use updateScene for incremental updates
   useEffect(() => {
+    if (!presentationMode || !excalidrawAPI || convertedElements.length === 0) return;
+
+    const prevCount = prevElementCountRef.current;
+    prevElementCountRef.current = convertedElements.length;
+
+    // Update scene with all elements (Excalidraw deduplicates by id)
+    excalidrawAPI.updateScene({ elements: convertedElements });
+
+    // Pan camera to the new elements only
+    const newElements = convertedElements.slice(prevCount);
+    if (newElements.length > 0) {
+      setTimeout(() => {
+        excalidrawAPI.scrollToContent(newElements, {
+          fitToContent: true,
+          animate: true,
+          duration: 500,
+        });
+      }, 100);
+    }
+  }, [presentationMode, excalidrawAPI, convertedElements]);
+
+  // Standard mode: auto zoom to fit all content
+  useEffect(() => {
+    if (presentationMode) return;
     if (excalidrawAPI && convertedElements.length > 0) {
-      // Small delay to ensure elements are rendered
       setTimeout(() => {
         excalidrawAPI.scrollToContent(convertedElements, {
           fitToContent: true,
@@ -53,14 +77,21 @@ export default function ExcalidrawCanvas({ elements }) {
         });
       }, 100);
     }
-  }, [excalidrawAPI, convertedElements]);
+  }, [presentationMode, excalidrawAPI, convertedElements]);
 
-  // Generate unique key when elements change to force remount
+  // Reset prev count when leaving presentation mode
+  useEffect(() => {
+    if (!presentationMode) {
+      prevElementCountRef.current = 0;
+    }
+  }, [presentationMode]);
+
+  // Generate unique key when elements change to force remount (standard mode only)
   const canvasKey = useMemo(() => {
+    if (presentationMode) return 'presentation';
     if (convertedElements.length === 0) return 'empty';
-    // Create a hash from elements to detect changes
     return JSON.stringify(convertedElements.map(el => el.id)).slice(0, 50);
-  }, [convertedElements]);
+  }, [convertedElements, presentationMode]);
 
   return (
     <div className="w-full h-full">
@@ -68,12 +99,12 @@ export default function ExcalidrawCanvas({ elements }) {
         key={canvasKey}
         excalidrawAPI={(api) => setExcalidrawAPI(api)}
         initialData={{
-          elements: convertedElements,
+          elements: presentationMode ? [] : convertedElements,
           appState: {
             viewBackgroundColor: '#ffffff',
             currentItemFontFamily: 1,
           },
-          scrollToContent: true,
+          scrollToContent: !presentationMode,
         }}
       />
     </div>

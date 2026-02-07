@@ -412,6 +412,67 @@ const CHART_VISUAL_SPECS = {
  * @param {string} chartType - Chart type (default: 'auto')
  * @returns {string} Complete user prompt
  */
+/**
+ * Presentation mode: ask LLM to create a step-by-step drawing plan
+ */
+export const PRESENTATION_PLAN_PROMPT = (userInput, chartType = 'auto') => {
+  const chartTypeName = chartType !== 'auto' ? CHART_TYPE_NAMES[chartType] : null;
+  const typeHint = chartTypeName ? ` The diagram type is: ${chartTypeName}.` : '';
+
+  return `Create a step-by-step drawing plan for this diagram.${typeHint} Each step should be a logical group of elements that builds on the previous steps.
+
+Return ONLY a numbered list, e.g.:
+1. Title and header elements
+2. Main process boxes
+3. Decision diamonds
+4. Connecting arrows
+5. Annotations and details
+
+Keep it to 3-7 steps. Be specific about what elements go in each step.
+
+User requirements:
+${userInput}`;
+};
+
+/**
+ * Presentation mode: system prompt for step-by-step generation
+ */
+export const PRESENTATION_SYSTEM_PROMPT = SYSTEM_PROMPT + `
+
+## Step-by-Step Generation Mode
+
+You are generating this diagram STEP BY STEP according to a plan.
+Rules:
+- Generate ONLY the elements for the current step
+- Every element MUST have a stable "id" field (e.g., "title-1", "box-1", "arrow-1")
+- You can bind arrows to elements from previous steps using their IDs
+- DO NOT regenerate or modify elements from previous steps
+- Return ONLY the JSON array of new elements for this step
+`;
+
+/**
+ * Presentation mode: prompt for generating a specific step
+ */
+export const PRESENTATION_STEP_PROMPT = (plan, existingElements, stepNumber, totalSteps, userInput, chartType = 'auto') => {
+  const parts = [];
+
+  const chartTypeName = chartType !== 'auto' ? CHART_TYPE_NAMES[chartType] : null;
+  if (chartTypeName) {
+    parts.push(`Diagram type: ${chartTypeName}`);
+  }
+
+  parts.push(`Drawing plan:\n${plan}`);
+
+  if (existingElements && existingElements.length > 0) {
+    parts.push(`Elements already on canvas:\n${JSON.stringify(existingElements)}`);
+  }
+
+  parts.push(`Now generate the elements for step ${stepNumber} of ${totalSteps}.`);
+  parts.push(`User requirements:\n${userInput}`);
+
+  return parts.join('\n\n');
+};
+
 export const USER_PROMPT_TEMPLATE = (userInput, chartType = 'auto') => {
   const promptParts = [];
 
